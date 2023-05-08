@@ -1,0 +1,61 @@
+{% load static %}
+
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
+  <div class="sidenav-header">
+    <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+    <a class="navbar-brand m-0" href="{% url 'admin:index' %}">
+      <!-- <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo"> -->
+      <span class="ms-1 font-weight-bold">Analytics Dashboard</span>
+    </a>
+  </div>
+  <div class="sidenav-footer mx-3 ">
+    <div class="card bg-light" id="sidenavCard">
+      <div class="card-body text-start p-3 w-100">
+        <div class="docs-info">
+          <h6 class="text-black up mb-0"><center>Upload a csv file</center></h6>
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row content">
+                <div class="col"> <br>
+                    <input type="file" class="btn btn-sm shadow-sm bg-white p-0 m-50" name="document" style="max-width:200px" id="document" required="required">
+                </div>
+                 <div class="col">
+                  <button id="submit" name="uploadbutton" class="shadow-sm bg-white rounded  ">Click to upload</a>
+                </div>
+            </div>
+        </form>
+          
+        </div>
+      </div>
+    </div>
+    &nbsp;
+    <div class="card bg-light" id="sidenavCard2">
+      <div class="card-body text-start p-3 w-100">
+          <h6 class="text-black up mb-0"><center>Select the Methods</center></h6>
+          <form action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="checkbox" id="datapreprocess"  name="methods" value="datapreprocess">
+            <label for="datapreprocess"> Data Preprocess</label><br>
+            <input type="checkbox" id="datacategorize" name="methods" value="datacategorize">
+            <label for="datacategorize"> Data Categorize</label><br>
+            <input type="checkbox" id="dataanalyze" name="methods" value="dataanalyze">
+            <label for="dataanalyze"> Data Analyze</label><br>
+            <input type="checkbox" id="datavisualize" name="methods" value="datavisualize">
+            <label for="datavisualize"> Data Visualize</label><br>
+            <div class="col"> 
+              <button id="submitmethod" name="methodsbutton" class="shadow-sm bg-white rounded  ">Run</a>
+            </div>
+          </form> 
+      </div>
+    </div>
+  </div>
+  {% block messages %}
+  {% if messages %}
+      <div class="container" style="color: firebrick; margin-top: 20px" >
+      {% for message in messages %}
+          {{ message }}
+      {% endfor %}
+      </div>
+  {% endif %}
+{% endblock %}
+</aside>

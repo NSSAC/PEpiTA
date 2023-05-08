@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <div class="container-fluid py-4">
+      {% if graphfile %}  
+      <div class="row ">
+        <div class="col-lg-12">
+          <div class="card z-index-2">
+            <div class="card-header pb-0">
+              <h6>Graph [<a href="/media/figures/{{graphfile}}" class="fas fa-download text-black p-2" download></a>]</h6>
+            </div>
+                <img src="/media/figures/{{graphfile}}" alt="Graph" style="width:1100px;height:550px;">
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if qdata %} 
+      <div class="row mt-4">
+        <div class="col-3">
+          <div class="card mb-3"> 
+            <div class="card-header pb-0">
+              <h6>Categorization table</h6>
+            </div>
+            <div class="card-body px-0 pt-0 pb-2">
+              <div class="table-responsive p-0">
+                <table class="table align-items-center justify-content-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quantile</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Value</th>
+                    </tr>
+                  </thead>
+                  {% for i in qdata %}
+                  <tbody>
+                      <tr>
+                        <td>
+                          <div class="d-flex px-2">
+                            <div class="my-auto">
+                              <h6 class="mb-0 text-sm">{{i.index}}</h6>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <p class="text-sm font-weight-bold mb-0">{{i.value}}</p>
+                        </td>
+                      </tr>
+                  </tbody>
+                  {% endfor %}
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {% include "includes/footer.html" %}
+      {% endif %}
+    </div>
+
+{% endblock content %}
