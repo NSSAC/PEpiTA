@@ -31,20 +31,28 @@
     &nbsp;
     <div class="card bg-light" id="sidenavCard2">
       <div class="card-body text-start p-3 w-100">
-          <h6 class="text-black up mb-0"><center>Select the Methods</center></h6>
+          <h6 class="text-black up mb-0"><center>Select Methods</center></h6>
           <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            <input type="checkbox" id="datapreprocess"  name="methods" value="datapreprocess">
-            <label for="datapreprocess"> Data Preprocess</label><br>
-            <input type="checkbox" id="datacategorize" name="methods" value="datacategorize">
-            <label for="datacategorize"> Data Categorize</label><br>
-            <input type="checkbox" id="dataanalyze" name="methods" value="dataanalyze">
-            <label for="dataanalyze"> Data Analyze</label><br>
-            <input type="checkbox" id="datavisualize" name="methods" value="datavisualize">
-            <label for="datavisualize"> Data Visualize</label><br>
-            <div class="col"> 
-              <button id="submitmethod" name="methodsbutton" class="shadow-sm bg-white rounded  ">Run</a>
-            </div>
+            <label>Data Preprocess</label>
+              <ul>
+                <li style="list-style-type: none;"><input type="checkbox" id="fill_dates"  name="datapreprocess" value="fill_dates">
+                  <label for="fill_dates"> fill_dates</label></li>
+                <li style="list-style-type: none;"><input type="checkbox" id="fill_values"  name="datapreprocess" value="fill_values">
+                  <label for="fill_values"> fill_values</label></li>
+                <li style="list-style-type: none;"><input type="checkbox" id="smoothing"  name="datapreprocess" value="smoothing">
+                  <label for="smoothing"> smoothing</label></li>
+              </ul>
+              <label>Data Categorize</label>
+              <ul>
+                <li style="list-style-type: none;"><input type="radio" id="lcut" name="datacategorize" value="L-cut">
+                  <label for="html">L-cut</label></li>
+                  <li style="list-style-type: none;"><input type="radio" id="lqcut" name="datacategorize" value="L-qcut">
+                    <label for="css">L-qcut</label></li>
+              </ul>
+              <div class="col"> 
+                <button id="submitmethod" name="methodsbutton" class="shadow-sm bg-white rounded  ">Run</a>
+              </div>
           </form> 
       </div>
     </div>
@@ -58,4 +66,8 @@
       </div>
   {% endif %}
 {% endblock %}
+{% if catdownload %}
+<h6>Download Categorical Time Series csv [<a href="/media/categorize_output/{{catdownload}}" class="fas fa-download text-black p-2" download></a>]</h6>
+{% endif %}
+
 </aside>

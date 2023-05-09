@@ -16,7 +16,6 @@ def dual_plot(pp_ts,cat_ts,bin_bounds):
     timestr = time.strftime("%Y%m%d-%H%M%S")
     name = timestr+'.png'
     save_path = os.getcwd() +'/media/figures/'+name 
-    print(save_path)
     f.savefig(save_path)
     plt.close(f)  
     return name 
