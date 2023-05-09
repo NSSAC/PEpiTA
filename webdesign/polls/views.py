@@ -72,7 +72,6 @@ def index(request):
             #data visualize
             name = visualize.dual_plot(pp_ts, cat_ts, bin_bounds)
             context.update({'graphfile': name})
-            print(context)
             return render(request, 'pages/index.html', context)
         else:
             messages.warning(request, 'Please upload a .csv file first!')
