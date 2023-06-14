@@ -38,7 +38,7 @@ def index(request):
             file_directory = d+'/media/'+csvname 
             messages.info(request, 'File upload Success!')
             loc = csvname.rfind("_")
-            csvname = csvname[0:loc]+'.csv'
+            csvname = csvname[0:len(csvname)-12]+'.csv'
             csvtime= os. path. getmtime(file_directory)
             
             context= {'csvname': csvname} 
@@ -61,6 +61,9 @@ def index(request):
     if request.method == 'POST' and 'methodsbutton' in request.POST:
         if exists(file_directory):
             context= {'csvname': csvname} 
+            csvtime= os. path. getmtime(file_directory)
+            context.update({'csvtime': time.ctime(csvtime)} );
+            
             methods=request.POST.getlist('datapreprocess')
             
             freq = 'D'

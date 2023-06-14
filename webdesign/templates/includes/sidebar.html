@@ -11,10 +11,11 @@
   </div>
   <div class="sidenav-footer mx-3 ">
     <div class="card bg-light" id="sidenavCard">
-      <div class="card-body text-start p-3 w-100">
+      <div class="card-body text-start p-0 w-100">
         <div class="docs-info">
           <form method="POST" enctype="multipart/form-data">
-            <label>Select csv type</label>
+            {% csrf_token %}
+            <label>Select csv type:</label>
             <ul >
               <li style="list-style-type: none;"><input type="radio" id="singletime" name="uploadtype" value="Single-time">
                 <label >Single-time series </label></li>
@@ -26,8 +27,7 @@
                   <input type="radio" id="weekly" name="csvfrequency" value="weekly">
                   <label>Weekly </label>
               </ul>
-            {% csrf_token %}
-            <h8 class="text-black up bold mb-0">Upload csv file</h8>
+            <label class="text-black up bold mb-0 p-0 w-100">Upload csv file:</label>
             <div class="row content">
                 <div class="col">
                     <input type="file" class="btn btn-sm shadow-sm bg-white p-0 m-50" name="document" style="max-width:200px" id="document" required="required">
@@ -54,12 +54,12 @@
   {% else %}
   &nbsp;
   {% endif %}
+
+   <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     <div class="card bg-light" id="sidenavCard2">
-      <div class="card-body text-start p-3 w-100">
-          <h6 class="text-black up mb-0"><center>Select Methods</center></h6>
-          <form action="" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <label>Data Preprocess</label>
+      <div class="card-body text-start p-0 w-100">
+            <label>Select Data Preprocess methods:</label>
               <ul>
                 <li style="list-style-type: none;"><input type="checkbox" id="fill_dates"  name="datapreprocess" value="fill_dates">
                   <label for="fill_dates"> Fill Dates</label></li>
@@ -75,7 +75,11 @@
                       </span>
                     </li></ul>
               </ul>
-
+            </div>
+          </div>
+          &nbsp;
+          <div class="card bg-light" id="sidenavCard3">
+            <div class="card-body text-start p-0 w-100">
               <label>Data Categorize</label><br>
               <ul>
               <li style="list-style-type: none;">
@@ -87,31 +91,33 @@
               <li style="list-style-type: none;">
                   <li style="list-style-type: none;"><input type="radio" id="categorizetypelevel" name="categorizetype" value="categorizetypelevel" onclick="displaySelect()">
                     <label >Level Based</label>
-                    <select name="levelbasedtype" id="levelbasedtype" style="width:61%;height:30px;font-size:13px;padding-top:1px;">
+                    <select name="levelbasedtype" id="levelbasedtype" style="width:61%;height:30px;font-size:13px;padding-top:1px;display:none">
                       <option value="L-cut">L-cut</option>
                       <option value="L-qcut">L-qcut</option>
                   </select></li>
 
                   <li style="list-style-type: none;"><input type="radio" id="categorizetypetrend" name="categorizetype" value="categorizetypetrend" onclick="displaySelect()">
                       <label >Trend Based</label>
-                      <select name="trendbasedtype" id="trendbasedtype" style="width:63%;height:30px;font-size:13px;padding-top:1px;">
+                      <select name="trendbasedtype" id="trendbasedtype" style="width:63%;height:30px;font-size:13px;padding-top:1px;display:none">
                         <option value="T-rate">T-rate</option>
                         <option value="T-percent">T-percent</option>
                     </select></li>
                     <li style="list-style-type: none;">
+                      <div style="display:none" id="trendbasedtypetextdiv">
                       <label for="trendsize" style="float: left;">Trend window:</label>
                       <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
                         <input type="text" id="trendsize" name="trendsize" placeholder="5" style="width:80%;height:28px">
                       </span>
+                    </div>
                     </li>
               </li>
               </ul>
               <div class="col"> 
                 <button id="submitmethod" name="methodsbutton" class="shadow-sm bg-white rounded  ">Run</a>
               </div>
-          </form> 
       </div>
     </div>
+  </form> 
 
   {% block messages %}
   {% if messages %}

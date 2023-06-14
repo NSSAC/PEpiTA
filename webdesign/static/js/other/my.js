@@ -4,10 +4,14 @@ var embed_opt2 = {"mode": "vega-lite", "actions": false};
 
 function displaySelect(){
     if (document.getElementById('categorizetypelevel').checked) {
-        console.log("yayy1111")
+        document.getElementById("levelbasedtype").style.display = '';
+        document.getElementById("trendbasedtype").style.display = 'none';
+        document.getElementById("trendbasedtypetextdiv").style.display = 'none';
       }
     if (document.getElementById('categorizetypetrend').checked) {
-        console.log("yayy2222")
+        document.getElementById("trendbasedtype").style.display = '';
+        document.getElementById("trendbasedtypetextdiv").style.display = '';
+        document.getElementById("levelbasedtype").style.display = 'none';
       }
 }
 
