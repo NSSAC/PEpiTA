@@ -1,62 +1,139 @@
 {% extends 'layouts/base.html' %}
+
 {% load static %}
+
+{% block script %}
+{% endblock %}
+
 
 {% block content %}
 
-    <div class="container-fluid py-4">
-      {% if graphfile %}  
-      <div class="row ">
-        <div class="col-lg-12">
-          <div class="card z-index-2">
-            <div class="card-header pb-0">
-              <h6>Graph [<a href="/media/figures/{{graphfile}}" class="fas fa-download text-black p-2" download></a>]</h6>
-            </div>
-                <img src="/media/figures/{{graphfile}}" alt="Graph" style="width:1100px;height:550px;">
-          </div>
+<div class="container-fluid py-4">
+  {% if graphfile %}  
+  <div class="row ">
+    <div class="col-lg-12">
+      <div class="card z-index-2">
+        <div class="card-header pb-0">
+          <h6>Graph [<a href="/media/figures/{{graphfile}}" class="fas fa-download text-black p-2" download></a>]</h6>
         </div>
+            <img src="/media/figures/{{graphfile}}" alt="Graph" style="width:1100px;height:550px;">
       </div>
-      {% endif %}
-      {% if qdata %} 
-      <div class="row mt-4">
-        <div class="col-3">
-          <div class="card mb-3"> 
-            <div class="card-header pb-0">
-              <h6>Categorization table</h6>
-            </div>
-            <div class="card-body px-0 pt-0 pb-2">
-              <div class="table-responsive p-0">
-                <table class="table align-items-center justify-content-center mb-0">
-                  <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quantile</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Value</th>
-                    </tr>
-                  </thead>
-                  {% for i in qdata %}
-                  <tbody>
-                      <tr>
-                        <td>
-                          <div class="d-flex px-2">
-                            <div class="my-auto">
-                              <h6 class="mb-0 text-sm">{{i.index}}</h6>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <p class="text-sm font-weight-bold mb-0">{{i.value}}</p>
-                        </td>
-                      </tr>
-                  </tbody>
-                  {% endfor %}
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {% include "includes/footer.html" %}
-      {% endif %}
     </div>
+  </div>
+  {% else %}
+  <div class="row ">
+    <div class="col-lg-12">
+      <div class="card z-index-2">
+        <div class="card-header pb-4">
+        <code style="color:rgb(138, 89, 89)"> Phase-based Epidemic Time series Analyzer is an interactive tool for public health
+          practitioners to extract insights from time series data related to ongoing epidemic outbreaks.<br><br>
+          Specifically, the tool will allow users to select a time series of epidemiological significance and
+          extract categorical indicators of activity over time. These categories could either be based 
+          on level of activity (e.g., quantile of wastewater viral load) or rate of change (e.g., change in
+          hospitalization rate). Such categorical indicators have been very useful for policymaking at
+          state, federal, and local levels during the COVID-19 response as well as for tracking seasonal
+          influenza over the years. <br><br>The team at UVA-BI has developed and refined various such indicators
+          in collaboration with Virginia Department of Health and US Centers for Disease Control and
+          Prevention for situation assessment as well as improved forecasting. Our goal is to
+          build a pathogen-agnostic platform for public health departments to adopt for tracking and
+          responding to various outbreaks.</code>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  {% endif %}
+
+  <!-- {% if chartspec %} 
+  <div class="row mt-4">
+    <div class="col-lg-12">
+      <div class="card z-index-2">
+        <div class="card-header pb-0">
+          <h6>Interactive Chart [work in progress..]</h6>
+        </div>
+          <div id="chartId"></div>
+  </div>
+  {% endif %} -->
+
+  {% if qdata %}
+  <div class="row mt-4">
+    <div class="col-4">
+      <div class="card mb-3">
+        <div class="card-header pb-0">
+          <h6>Categorization table</h6>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center justify-content-center mb-0">
+              <thead  style="display: table; width: 100%;">
+                <tr>
+                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Quantile</th>
+                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Value</th>
+                </tr>
+              </thead>
+              <tbody style="display: block; max-height: 250px;overflow-y:scroll;">
+                {% for i in qdata %}
+                <tr style="display:table;width:100%;">
+                  <td>
+                    <div class="d-flex px-2">
+                      <div class="my-auto">
+                        <h6 class="mb-0 text-sm">{{i.index}}</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-sm font-weight-bold mb-0">{{i.value}}</p>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    {% endif %}
+    {% if csvdata %}
+ 
+    <div class="col-4">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h6>CSV File Data</h6>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-0 text-center">
+              <thead style="display: table; width: 100%;">
+                <tr>
+                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Date</th>
+                  <th class="text-uppercase text-secondary text-xs font-weight-bolder opacity-10 ">Value</th>
+                </tr>
+              </thead>
+              <tbody style="display: block; max-height: 250px;overflow-y:scroll;">
+                {% for i in csvdata %}
+                <tr style="display:table;width:100%;">
+                  <td>
+                    <div class="d-flex px-2">
+                      <div class="my-auto">
+                        <h6 class="mb-0 text-sm">{{i.date|date:"SHORT_DATE_FORMAT"}}</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-sm font-weight-bold mb-0">{{i.value}}</p>
+                  </td>
+                </tr>
+
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include "includes/footer.html" %}
+  {% endif %}
+</div>
 {% endblock content %}

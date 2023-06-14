@@ -3,7 +3,7 @@
 <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
   <div class="sidenav-header">
     <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-  <a class="navbar-brand m-0" href="">
+  <a class="navbar-brand m-0" href="{% url 'index' %}">
       <!-- <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo"> -->
       <span class="font-weight-bold"><h4>PEpiTA</h4></span>
     </a>
@@ -13,11 +13,23 @@
     <div class="card bg-light" id="sidenavCard">
       <div class="card-body text-start p-3 w-100">
         <div class="docs-info">
-          <h6 class="text-black up mb-0"><center>Upload a csv file</center></h6>
           <form method="POST" enctype="multipart/form-data">
+            <label>Select csv type</label>
+            <ul >
+              <li style="list-style-type: none;"><input type="radio" id="singletime" name="uploadtype" value="Single-time">
+                <label >Single-time series </label></li>
+                <li style="list-style-type: none;"><input type="radio" id="multitime" name="uploadtype" value="Multi-time">
+                <label>Multi-time series </label></li>
+            <label>Frequency</label><br>
+                <input type="radio" id="daily" name="csvfrequency" value="daily">
+                  <label >Daily </label>
+                  <input type="radio" id="weekly" name="csvfrequency" value="weekly">
+                  <label>Weekly </label>
+              </ul>
             {% csrf_token %}
+            <h8 class="text-black up bold mb-0">Upload csv file</h8>
             <div class="row content">
-                <div class="col"> <br>
+                <div class="col">
                     <input type="file" class="btn btn-sm shadow-sm bg-white p-0 m-50" name="document" style="max-width:200px" id="document" required="required">
                 </div>
                  <div class="col">
@@ -25,11 +37,23 @@
                 </div>
             </div>
         </form>
-          
         </div>
       </div>
     </div>
-    &nbsp;
+  {% if csvname %} 
+  <div>
+    <code>File in memory: {{csvname}}</code>
+    <code>Last Updated: {{csvtime}}</code>
+  </div>
+  {% elif messages %}
+  <div class="container" style="color: firebrick; margin-top: 20px" >
+  {% for message in messages %}
+      {{ message }}
+  {% endfor %}
+  </div>
+  {% else %}
+  &nbsp;
+  {% endif %}
     <div class="card bg-light" id="sidenavCard2">
       <div class="card-body text-start p-3 w-100">
           <h6 class="text-black up mb-0"><center>Select Methods</center></h6>
@@ -38,18 +62,49 @@
             <label>Data Preprocess</label>
               <ul>
                 <li style="list-style-type: none;"><input type="checkbox" id="fill_dates"  name="datapreprocess" value="fill_dates">
-                  <label for="fill_dates"> fill_dates</label></li>
+                  <label for="fill_dates"> Fill Dates</label></li>
                 <li style="list-style-type: none;"><input type="checkbox" id="fill_values"  name="datapreprocess" value="fill_values">
-                  <label for="fill_values"> fill_values</label></li>
+                  <label for="fill_values"> Fill Values</label></li>
                 <li style="list-style-type: none;"><input type="checkbox" id="smoothing"  name="datapreprocess" value="smoothing">
-                  <label for="smoothing"> smoothing</label></li>
+                  <label for="smoothing"> Smoothing</label></li>
+                  <ul>
+                    <li style="list-style-type: none;">
+                      <label for="binsize" style="float: left;">Window:</label>
+                      <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
+                        <input type="text" id="smoothingwindow" name="smoothingwindow" placeholder="7" style="width:70%;height:28px">
+                      </span>
+                    </li></ul>
               </ul>
-              <label>Data Categorize</label>
+
+              <label>Data Categorize</label><br>
               <ul>
-                <li style="list-style-type: none;"><input type="radio" id="lcut" name="datacategorize" value="L-cut">
-                  <label for="html">L-cut</label></li>
-                  <li style="list-style-type: none;"><input type="radio" id="lqcut" name="datacategorize" value="L-qcut">
-                    <label for="css">L-qcut</label></li>
+              <li style="list-style-type: none;">
+                <label for="binsize" style="float: left;">Number of Bins:</label>
+                <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
+                  <input type="text" id="binsize" name="binsize" placeholder="5" style="width:91%;height:28px">
+                </span>
+              </li>
+              <li style="list-style-type: none;">
+                  <li style="list-style-type: none;"><input type="radio" id="categorizetypelevel" name="categorizetype" value="categorizetypelevel" onclick="displaySelect()">
+                    <label >Level Based</label>
+                    <select name="levelbasedtype" id="levelbasedtype" style="width:61%;height:30px;font-size:13px;padding-top:1px;">
+                      <option value="L-cut">L-cut</option>
+                      <option value="L-qcut">L-qcut</option>
+                  </select></li>
+
+                  <li style="list-style-type: none;"><input type="radio" id="categorizetypetrend" name="categorizetype" value="categorizetypetrend" onclick="displaySelect()">
+                      <label >Trend Based</label>
+                      <select name="trendbasedtype" id="trendbasedtype" style="width:63%;height:30px;font-size:13px;padding-top:1px;">
+                        <option value="T-rate">T-rate</option>
+                        <option value="T-percent">T-percent</option>
+                    </select></li>
+                    <li style="list-style-type: none;">
+                      <label for="trendsize" style="float: left;">Trend window:</label>
+                      <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
+                        <input type="text" id="trendsize" name="trendsize" placeholder="5" style="width:80%;height:28px">
+                      </span>
+                    </li>
+              </li>
               </ul>
               <div class="col"> 
                 <button id="submitmethod" name="methodsbutton" class="shadow-sm bg-white rounded  ">Run</a>
@@ -57,7 +112,7 @@
           </form> 
       </div>
     </div>
-  </div>
+
   {% block messages %}
   {% if messages %}
       <div class="container" style="color: firebrick; margin-top: 20px" >
