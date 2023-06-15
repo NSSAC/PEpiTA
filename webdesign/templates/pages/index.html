@@ -87,19 +87,21 @@
                 {% for i in qdata %}
                 <tr >
                   <td class="align-middle text-center">
-                      {{i.index}}
+                    <h6 class="mb-0 text-sm">{{i.index}}</h6>
                   </td>
                   <td class="align-middle text-center">
-                      {{i.category}}
+                    <h6 class="mb-0 text-sm">{{i.category}}</h6>
                   </td>
                   <td class="align-middle text-center">
-                    {{i.count}}
+                    <h6 class="mb-0 text-sm">{{i.count}}</h6>
                 </td>
                 <td class="align-middle text-center">
-                 {{i.percent}}
+                  <h6 class="mb-0 text-sm">{{i.percent}}</h6>
+                 
               </td>
               <td class="align-middle text-center" >
-                {{i.bounds}}
+                <h6 class="mb-0 text-sm">{{i.bounds}}</h6>
+            
             </td>
                 </tr>
                 {% endfor %}
