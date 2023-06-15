@@ -12,6 +12,7 @@ from .scripts import analyze
 from .scripts import categorize
 from .scripts import visualize
 import altair as alt 
+import numpy as np
 
 
 file_directory = ''
@@ -24,6 +25,7 @@ def index(request):
     context = {}
     cat_ts = pd.Series
     trend_ts = pd.Series
+    bin_bounds = np.ndarray
 
     global file_directory, input_ts, pp_ts, csvname, csvfreq
 
@@ -63,7 +65,7 @@ def index(request):
             context= {'csvname': csvname} 
             csvtime= os. path. getmtime(file_directory)
             context.update({'csvtime': time.ctime(csvtime)} );
-            
+
             methods=request.POST.getlist('datapreprocess')
             
             freq = 'D'
@@ -105,7 +107,6 @@ def index(request):
 
             if pp_ts.empty:
                 pp_ts = input_ts    
-            print(cat_method)
             if(cat_method[0] == 'categorizetypelevel'):
                 levelbasedtype = request.POST.get('levelbasedtype')
                 cat_ts, bin_bounds = categorize.level_categorize(pp_ts, levelbasedtype, num_bins)
@@ -120,18 +121,18 @@ def index(request):
             context.update( {'catdownload': name} )
 
             #data analyze
-            context.update( {'d': analyze.cat_counts(cat_ts)} )
+            # context.update( {'d': analyze.single_ts_analyze(cat_ts, bin_bounds)} )
 
-            df = pd.DataFrame( analyze.cat_counts(cat_ts))
+            df = pd.DataFrame( analyze.single_ts_analyze(cat_ts, bin_bounds))
             data = []
             data = json.loads(df.reset_index().to_json(orient='records'))
             context.update({'qdata': data})
 
             #data visualize
             if(cat_method[0] == 'categorizetypelevel'):
-                name = visualize.dual_plot(pp_ts, cat_ts, bin_bounds)
+                name = visualize.single_ts_level_plot(pp_ts, cat_ts, bin_bounds)
             elif(cat_method[0] == 'categorizetypetrend'):
-                name = visualize.triple_plot(pp_ts,trend_ts,cat_ts,bin_bounds)
+                name = visualize.single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds)
             context.update({'graphfile': name})
 
 
@@ -149,7 +150,6 @@ def index(request):
             context['chartembed_opt']=embed_opt
             context['alt']=alt
 
-            print(input_ts)
             context.update( {'csvdata':input_ts.to_dict('records')})
             
         else:
@@ -163,7 +163,6 @@ def readfile(filename):
     input_ts = pd.read_csv(filename,parse_dates=['date'])
 
 def csvtables(request):
-    print(input_ts)
     context={}
     # context.update( {'csvdata':input_ts.to_dict('records')}) 
     # print(context)
