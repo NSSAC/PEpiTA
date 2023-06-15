@@ -1,3 +1,6 @@
 
 Django==4.2
 pandas==1.4.2
+json5==0.9.6
+matplotlib==3.5.1
+numpy==1.21.5
