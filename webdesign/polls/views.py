@@ -79,9 +79,8 @@ def index(request):
             else:
                 smoothing_window = int(smoothing_window)
             for method in methods:
-                if method == 'fill_dates':
+                if method == 'fill_datesvalues':
                     pp_ts = preprocess.fill_dates(input_ts, freq)
-                if method == 'fill_values':
                     fill_method = 'linear'
                     if pp_ts.empty:
                          pp_ts = input_ts
@@ -95,7 +94,6 @@ def index(request):
             cat_method=request.POST.getlist('categorizetype')
             num_bins = request.POST.get('binsize')
             win_size = request.POST.get('trendsize')
-         
             if(not num_bins):
                 num_bins = 5
             else:
@@ -106,27 +104,48 @@ def index(request):
                 win_size = int(win_size)
 
             if pp_ts.empty:
-                pp_ts = input_ts    
+                pp_ts = input_ts   
+            
+            minval=0
+            maxval=50
+            custom_range=()
+            if request.POST.getlist('custombin'):
+                if request.POST.get('mincustomsize'):
+                    minval=int(request.POST.get('mincustomsize'))
+                if request.POST.get('maxcustomsize'):
+                    maxval=int(request.POST.get('maxcustomsize'))
+            custom_range = (minval,maxval)
+
             if(cat_method[0] == 'categorizetypelevel'):
                 levelbasedtype = request.POST.get('levelbasedtype')
-                cat_ts, bin_bounds = categorize.level_categorize(pp_ts, levelbasedtype, num_bins)
+                if request.POST.getlist('custombin') and levelbasedtype=="L-cut":
+                    cat_ts, bin_bounds = categorize.level_categorize(pp_ts, levelbasedtype, num_bins, custom_range)
+                else:
+                    cat_ts, bin_bounds = categorize.level_categorize(pp_ts, levelbasedtype, num_bins)
             elif(cat_method[0] == 'categorizetypetrend'):
                 trendbasedtype = request.POST.get('trendbasedtype')
-                trend_ts, (cat_ts, bin_bounds) = categorize.trend_categorize(pp_ts, trendbasedtype, win_size, num_bins)
+                if request.POST.getlist('custombin'):
+                    trend_ts, (cat_ts, bin_bounds) = categorize.trend_categorize(pp_ts, trendbasedtype, win_size, num_bins, custom_range)
+                else:
+                    trend_ts, (cat_ts, bin_bounds) = categorize.trend_categorize(pp_ts, trendbasedtype, win_size, num_bins)
             
             timestr = time.strftime("%Y%m%d-%H%M%S")
-            name=timestr+'.csv' 
+            name=timestr+'_catdownload.csv' 
             save_path = os.getcwd() +'/media/categorize_output/'+name
             cat_ts.to_csv(save_path) 
             context.update( {'catdownload': name} )
 
             #data analyze
-            # context.update( {'d': analyze.single_ts_analyze(cat_ts, bin_bounds)} )
-
-            df = pd.DataFrame( analyze.single_ts_analyze(cat_ts, bin_bounds))
+            df = pd.DataFrame( analyze.single_ts_analyze(cat_ts, bin_bounds, freq))
             data = []
             data = json.loads(df.reset_index().to_json(orient='records'))
             context.update({'qdata': data})
+
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            name=timestr+'_analyticalsummary.csv' 
+            save_path = os.getcwd() +'/media/analytical_summary/'+name
+            df.to_csv(save_path) 
+            context.update( {'analyticalsummary': name} )
 
             #data visualize
             if(cat_method[0] == 'categorizetypelevel'):

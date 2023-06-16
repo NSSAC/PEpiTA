@@ -25,6 +25,31 @@
 
     {% block extrahead %}{% endblock extrahead %}
     {% block extrastyle %}{% endblock extrastyle %}
+    <style>
+      .tooltip-text {
+        visibility: hidden;
+        position: absolute;
+        z-index: 10;
+        width: 110px;
+        color: white;
+        font-size: 12px;
+        background-color: #95989b;
+        border-radius: 10px;
+        padding: 1px 1px 1px 1px;
+      }
+
+      .hover-text:hover .tooltip-text {
+        visibility: visible;
+      }
+
+      .hover-text {
+        position: relative;
+        display: inline-block;
+        margin: 0.5px;
+        font-family: Arial;
+        text-align: center;
+      }
+    </style>
 
 </head>
 
@@ -67,13 +92,13 @@
   console.log(chartspec)
 </script> -->
 
- <script src="https://cdn.jsdelivr.net/npm/vega@{{ alt.VEGA_VERSION }}"></script>
+ <!-- <script src="https://cdn.jsdelivr.net/npm/vega@{{ alt.VEGA_VERSION }}"></script>
  <script src="https://cdn.jsdelivr.net/npm/vega-lite@{{ alt.VEGALITE_VERSION }}"></script>
- <script src="https://cdn.jsdelivr.net/npm/vega-embed@{{ alt.VEGAEMBED_VERSION }}"></script>
+ <script src="https://cdn.jsdelivr.net/npm/vega-embed@{{ alt.VEGAEMBED_VERSION }}"></script> -->
 
  <script>
-spec1 = {{ chartspec|safe }}
-embed_opt1 = {{ chartembed_opt|safe}}
+// spec1 = {{ chartspec|safe }}
+// embed_opt1 = {{ chartembed_opt|safe}}
 
 // console.log(spec1);
 // console.log(typeof(spec1));
@@ -86,17 +111,17 @@ embed_opt1 = {{ chartembed_opt|safe}}
 // console.log(typeof(spec));
 
 
-function showError(chartId, error){{
-    chartId.innerHTML = ('<div class="error">'
-                    + '<p>JavaScript Error: ' + error.message + '</p>'
-                    + "<p>This usually means there's a typo in your chart specification. "
-                    + "See the javascript console for the full traceback.</p>"
-                    + '</div>');
-    throw error;
-}}
-const chartId = document.getElementById('chartId');
-vegaEmbed("#chartId", spec1, embed_opt1)
-  .catch(error => showError(chartId, error));
+// function showError(chartId, error){{
+//     chartId.innerHTML = ('<div class="error">'
+//                     + '<p>JavaScript Error: ' + error.message + '</p>'
+//                     + "<p>This usually means there's a typo in your chart specification. "
+//                     + "See the javascript console for the full traceback.</p>"
+//                     + '</div>');
+//     throw error;
+// }}
+// const chartId = document.getElementById('chartId');
+// vegaEmbed("#chartId", spec1, embed_opt1)
+//   .catch(error => showError(chartId, error));
   
  </script>
 

@@ -66,43 +66,42 @@
 
   {% if qdata %}
   <div class="row mt-4">
-    <div class="col-9">
+    <div class="col-12">
       <div class="card mb-3">
         <div class="card-header pb-0">
-          <h6>Categorization table</h6>
+          <h6>Analytical summary [<a href="/media/analytical_summary/{{analyticalsummary}}" class="fas fa-download text-black p-2" download></a>]</h6>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0">
             <table class="table align-items-center justify-content-center mb-0">
               <thead >
                 <tr>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Index</th>
                   <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Category</th>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Count</th>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Percent</th>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Bounds</th>
+                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Bin Boundaries</th>
+                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Number of Occurrences</th>
+                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Percent Time Spent</th>
+                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Average Duration Spent</th>
                 </tr>
               </thead>
               <tbody>
                 {% for i in qdata %}
                 <tr >
                   <td class="align-middle text-center">
-                    <h6 class="mb-0 text-sm">{{i.index}}</h6>
-                  </td>
-                  <td class="align-middle text-center">
                     <h6 class="mb-0 text-sm">{{i.category}}</h6>
                   </td>
                   <td class="align-middle text-center">
-                    <h6 class="mb-0 text-sm">{{i.count}}</h6>
+                    <h6 class="mb-0 text-sm">{{i.bin_boundaries}}</h6>
                 </td>
                 <td class="align-middle text-center">
-                  <h6 class="mb-0 text-sm">{{i.percent}}</h6>
+                  <h6 class="mb-0 text-sm">{{i.number_of_occurrences}}</h6>
                  
               </td>
               <td class="align-middle text-center" >
-                <h6 class="mb-0 text-sm">{{i.bounds}}</h6>
-            
+                <h6 class="mb-0 text-sm">{{i.percent_time_spent}}</h6>
             </td>
+            <td class="align-middle text-center" >
+              <h6 class="mb-0 text-sm">{{i.average_duration_spent}}</h6>
+          </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -114,7 +113,7 @@
   
     {% endif %}
     {% if catdownload %}
-      <h6>Download Categorical Time Series csv [<a href="/media/categorize_output/{{catdownload}}" class="fas fa-download text-black" download></a>]</h6>
+      <h6>Download Categorical Time Series csv [<a href="/media/categorize_output/{{catdownload}}" class="fas fa-download text-black p-2" download></a>]</h6>
       
   </div>
   {% include "includes/footer.html" %}
