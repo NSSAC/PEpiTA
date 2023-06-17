@@ -20,14 +20,16 @@ input_ts = pd.DataFrame()
 pp_ts = pd.DataFrame()
 csvname=''
 csvfreq='daily'
+csvtime=''
+context={}
 
 def index(request):
-    context = {}
     cat_ts = pd.Series
     trend_ts = pd.Series
     bin_bounds = np.ndarray
 
-    global file_directory, input_ts, pp_ts, csvname, csvfreq
+    global file_directory, input_ts, pp_ts, csvname, csvfreq, csvtime, context
+    context={}
 
     if request.method == 'POST' and 'uploadbutton' in request.POST:
         uploaded_file = request.FILES['document']
@@ -44,12 +46,12 @@ def index(request):
             csvtime= os. path. getmtime(file_directory)
             
             context= {'csvname': csvname} 
-            context.update({'csvtime': time.ctime(csvtime)} );
+            context.update({'csvtime': time.ctime(csvtime)} )
 
             readfile(file_directory)
             csvfreq=request.POST.getlist('csvfrequency')
             
-            # context.update( {'csvdata':input_ts.to_dict('records')}) 
+            context.update( {'csvdata':input_ts.to_dict('records')}) 
     
         elif not uploaded_file.name.endswith('.csv'):
             messages.warning(request, 'Please use .csv file extension!')
@@ -178,21 +180,6 @@ def index(request):
                 name = visualize.single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds)
             context.update({'graphfile': name})
 
-
-            data3 = pd.DataFrame({
-            'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
-            'b': [28, 55, 43, 91, 81, 53, 19, 87, 52] })
-            chartVar = alt.Chart(data3).mark_bar().encode(
-            x='a',
-            y='b').properties(width=800)
-
-            spec = chartVar.to_json()
-            embed_opt = json.dumps({"mode": "vega-lite", "actions": True})
-           
-            context['chartspec']=spec
-            context['chartembed_opt']=embed_opt
-            context['alt']=alt
-
             context.update( {'csvdata':input_ts.to_dict('records')})
             
         else:
@@ -206,7 +193,13 @@ def readfile(filename):
     input_ts = pd.read_csv(filename,parse_dates=['date'])
 
 def csvtables(request):
-    context={}
-    # context.update( {'csvdata':input_ts.to_dict('records')}) 
-    # print(context)
-    return render(request, 'pages/csvtables.html',context)
+    global context
+    print("yayyy")
+    print(request)
+    if request.method == 'POST':
+        print("inside")
+        index(request)
+        print("inside111111")
+        return render(request, 'pages/index.html',context)
+    else:
+        return render(request, 'pages/csvtables.html',context)

@@ -6,13 +6,14 @@
       <h6 class="text-black up mb-0">Phase-based Epidemic Time series Analyzer</h6>
     </nav>
   </div>
-
-    <!-- <div class="container-fluid py-1 px-7">
-      <a href="{% url 'index' %}" class="nav-link text-body font-weight-bold">
+  {% if csvdata %}
+    <div class="container-fluid py-1 px-7">
+      <a href="{% url 'csvtables' %}" class="nav-link text-body font-weight-bold">
         <i class="fa fa-file-csv me-sm-1"></i>
         <span class="d-sm-inline d-none">View CSV Data</span>
       </a>
-    </div> -->
+    </div>
+    {% endif %}
   
 </nav>
 <!-- End Navbar -->
