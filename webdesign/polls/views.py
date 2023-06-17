@@ -66,18 +66,23 @@ def index(request):
             csvtime= os. path. getmtime(file_directory)
             context.update({'csvtime': time.ctime(csvtime)} );
 
+            formdata = {}
+            # formdata['csvfrequency'] = freq
             methods=request.POST.getlist('datapreprocess')
             
             freq = 'D'
             if csvfreq == 'weekly':
                 freq = 'W'
-
+            
             smoothing_window = request.POST.get('smoothingwindow')
 
             if(not smoothing_window):
                 smoothing_window = 7
             else:
                 smoothing_window = int(smoothing_window)
+            
+            formdata['smoothingwindow'] = smoothing_window
+            
             for method in methods:
                 if method == 'fill_datesvalues':
                     pp_ts = preprocess.fill_dates(input_ts, freq)
@@ -85,10 +90,12 @@ def index(request):
                     if pp_ts.empty:
                          pp_ts = input_ts
                     pp_ts = preprocess.fill_values(pp_ts, fill_method)
+                    formdata['fill_datesvalues'] = 'checked'
                 if method == 'smoothing':
                     if pp_ts.empty:
                          pp_ts = input_ts
                     pp_ts = preprocess.smoothing(pp_ts, smoothing_window)
+                    formdata['smoothing'] = 'checked'
 
             #data categorize
             cat_method=request.POST.getlist('categorizetype')
@@ -102,6 +109,8 @@ def index(request):
                 win_size = 5
             else:
                 win_size = int(win_size)
+            
+            formdata['binsize'] = num_bins
 
             if pp_ts.empty:
                 pp_ts = input_ts   
@@ -118,16 +127,31 @@ def index(request):
 
             if(cat_method[0] == 'categorizetypelevel'):
                 levelbasedtype = request.POST.get('levelbasedtype')
+                formdata['categorizetypelevel'] = 'checked'
+                formdata['levelbasedtype'] = levelbasedtype
                 if request.POST.getlist('custombin') and levelbasedtype=="L-cut":
                     cat_ts, bin_bounds = categorize.level_categorize(pp_ts, levelbasedtype, num_bins, custom_range)
+                    formdata['custombin'] = 'checked'
+                    formdata['mincustomsize'] = minval
+                    formdata['maxcustomsize'] = maxval
                 else:
                     cat_ts, bin_bounds = categorize.level_categorize(pp_ts, levelbasedtype, num_bins)
             elif(cat_method[0] == 'categorizetypetrend'):
                 trendbasedtype = request.POST.get('trendbasedtype')
+                formdata['categorizetypetrend'] = 'checked'
+                formdata['levelbasedtype'] = trendbasedtype
+                formdata['trendsize'] = win_size
+
                 if request.POST.getlist('custombin'):
                     trend_ts, (cat_ts, bin_bounds) = categorize.trend_categorize(pp_ts, trendbasedtype, win_size, num_bins, custom_range)
+                    formdata['custombin'] = 'checked'
+                    formdata['mincustomsize'] = minval
+                    formdata['maxcustomsize'] = maxval
                 else:
                     trend_ts, (cat_ts, bin_bounds) = categorize.trend_categorize(pp_ts, trendbasedtype, win_size, num_bins)
+
+            context.update( {'formdata': json.dumps(formdata)} )
+            print(json.dumps(formdata))
             
             timestr = time.strftime("%Y%m%d-%H%M%S")
             name=timestr+'_catdownload.csv' 

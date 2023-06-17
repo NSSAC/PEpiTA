@@ -86,46 +86,51 @@
 <script src="{% static 'js/scripts.js' %}"></script>
 
 {% block extrascripts %}
-<!-- <script>
-  var chartspec = "{{ chartspec | safe}}";
-  var chartembed_opt = "{{ chartembed_opt | safe}}";
-  console.log(chartspec)
-</script> -->
-
- <!-- <script src="https://cdn.jsdelivr.net/npm/vega@{{ alt.VEGA_VERSION }}"></script>
- <script src="https://cdn.jsdelivr.net/npm/vega-lite@{{ alt.VEGALITE_VERSION }}"></script>
- <script src="https://cdn.jsdelivr.net/npm/vega-embed@{{ alt.VEGAEMBED_VERSION }}"></script> -->
 
  <script>
-// spec1 = {{ chartspec|safe }}
-// embed_opt1 = {{ chartembed_opt|safe}}
+var formData = {{ formdata|safe }} 
+for (var key of Object.keys(formData)) {
+    if(key=="fill_datesvalues" || key=="smoothing" || key=="custombin"){
+      document.getElementById(key).checked = true;
+      if(key=="smoothing" ) {
+        document.getElementById("smoothingwindow").value = formData["smoothingwindow"];
+      }
+      if(key=="custombin" ) {
+        document.getElementById("customsizediv").style.display = '';
+        document.getElementById("mincustomsize").value = formData["mincustomsize"];
+        document.getElementById("maxcustomsize").value = formData["maxcustomsize"];
+      }
+    }
+    if(key=="binsize"){
+      document.getElementById("binsize").value = formData["binsize"]
+    }
+    if(key=="categorizetypetrend"){
+      document.getElementById("trendbasedtype").style.display = '';
+      document.getElementById("trendbasedtypetextdiv").style.display = '';
+      document.getElementById("levelbasedtype").style.display = 'none';
+      document.getElementById('categorizetypetrend').checked = true;
+      document.getElementById('trendsize').value = formData["trendsize"];
+      if(formData["levelbasedtype"] == "T-percent")
+        document.getElementById('trendbasedtype').selectedIndex = 1;
+      else
+        document.getElementById('trendbasedtype').selectedIndex = 0;
+    }
+    if(key=="categorizetypelevel"){
+      document.getElementById("levelbasedtype").style.display = '';
+      document.getElementById("trendbasedtype").style.display = 'none';
+      document.getElementById("trendbasedtypetextdiv").style.display = 'none';
+      document.getElementById('categorizetypelevel').checked = true;
+      document.getElementById('levelbasedtype').selectedIndex = 1;
+      if(formData["levelbasedtype"] == "L-cut")
+        document.getElementById('levelbasedtype').selectedIndex = 0;
+      else
+        document.getElementById('levelbasedtype').selectedIndex = 1;
+    }
 
-// console.log(spec1);
-// console.log(typeof(spec1));
+}
+ 
 
-// console.log(embed_opt1);
-// console.log(typeof(embed_opt1));
-
-
-// console.log(spec);
-// console.log(typeof(spec));
-
-
-// function showError(chartId, error){{
-//     chartId.innerHTML = ('<div class="error">'
-//                     + '<p>JavaScript Error: ' + error.message + '</p>'
-//                     + "<p>This usually means there's a typo in your chart specification. "
-//                     + "See the javascript console for the full traceback.</p>"
-//                     + '</div>');
-//     throw error;
-// }}
-// const chartId = document.getElementById('chartId');
-// vegaEmbed("#chartId", spec1, embed_opt1)
-//   .catch(error => showError(chartId, error));
-  
  </script>
-
-
 <script type="text/JavaScript" src="{%  static 'js/other/my.js' %}"></script>
 {% endblock %}
 
