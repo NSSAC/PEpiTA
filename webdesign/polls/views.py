@@ -184,7 +184,7 @@ def index(request):
             
         else:
             messages.warning(request, 'Please upload a .csv file first!')
-
+    context.update( {'currentpath':'index'})
     return render(request, 'pages/index.html',context)
 
 
@@ -194,12 +194,9 @@ def readfile(filename):
 
 def csvtables(request):
     global context
-    print("yayyy")
-    print(request)
+    context.update( {'currentpath':'csvtables'})
     if request.method == 'POST':
-        print("inside")
         index(request)
-        print("inside111111")
         return render(request, 'pages/index.html',context)
     else:
         return render(request, 'pages/csvtables.html',context)
