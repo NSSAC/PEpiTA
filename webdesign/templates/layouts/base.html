@@ -30,12 +30,12 @@
         visibility: hidden;
         position: absolute;
         z-index: 10;
-        width: 110px;
+        width: 130px;
         color: white;
-        font-size: 12px;
+        font-size: 11px;
         background-color: #95989b;
-        border-radius: 10px;
-        padding: 1px 1px 1px 1px;
+        border-radius: 11px;
+        padding: 2px 2px 2px 2px;
       }
 
       .hover-text:hover .tooltip-text {
@@ -87,9 +87,47 @@
 
 {% block extrascripts %}
 
+{{ formdata|json_script:"formdata" }}
+{{ imagelist|json_script:"imagelist" }}
+
  <script>
-var formData = {{ formdata|safe }} 
-for (var key of Object.keys(formData)) {
+const imagelist = JSON.parse(document.getElementById('imagelist').textContent);
+
+let slideIndex = 1;
+if(imagelist !== "") {
+  showSlides(slideIndex);
+}
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.querySelectorAll(".slides");
+  if (n > slides.length) {
+    slideIndex = 1
+  }
+  if (n < 1) {
+    slideIndex = slides.length
+  }
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";
+  }
+
+  slides[slideIndex - 1].style.display = "block";
+}
+
+
+const formdata = JSON.parse(document.getElementById('formdata').textContent);
+if(formdata !== "") {
+  console.log("yayy");
+  formData=JSON.parse(formdata);
+  for (var key of Object.keys(formData)) {
     if(key=="fill_datesvalues" || key=="smoothing" || key=="custombin"){
       document.getElementById(key).checked = true;
       if(key=="smoothing" ) {
@@ -126,8 +164,10 @@ for (var key of Object.keys(formData)) {
       else
         document.getElementById('levelbasedtype').selectedIndex = 1;
     }
-
+  }
 }
+
+
  
 
  </script>

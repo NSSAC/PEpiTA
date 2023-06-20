@@ -15,6 +15,15 @@ function displaySelect(){
       else {
           document.getElementById("customsizediv").style.display = 'none';
       }
+      // if (document.getElementById("multitime").checked) {
+      //   document.getElementById("multiseriestypetextdiv").style.display = '';
+      //   document.getElementById("custombin").disabled = true;
+      // }
+      // if(document.getElementById("singletime").checked){
+      //   document.getElementById("multiseriestypetextdiv").style.display = 'none';
+      //   document.getElementById("custombin").disabled = false;
+      // }
+      
 }
 
 

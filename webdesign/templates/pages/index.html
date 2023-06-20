@@ -9,7 +9,26 @@
 {% block content %}
 
 <div class="container-fluid py-4">
-  {% if graphfile %}  
+  {% if imagelist and 'Multitime' in csvtype %}  
+  <div class="row ">
+    <div class="col-lg-12">
+      <div class="card z-index-2">
+        <div class="card-header pb-0">
+          <h6>Graph [<a href="/media/zip/{{multiimagezip}}" class="fas fa-download text-black p-2" download></a>]</h6>
+        </div>
+        {% for i in imagelist %}
+        <div class="photos" style="position: relative;margin: auto;">
+          <img class="slides" src="/media/figures/{{i.name}}" alt="Graph" style="display: none;animation-name: fade;animation-duration: 1.5s;width:1100px;height:550px;">
+        </div>
+        {% endfor %}
+        <span><button name="button" class="shadow-sm bg-white rounded" onclick="plusSlides(-1)" style="width: 5%;position: static;">Prev</button>
+          <button name="button" class="shadow-sm bg-white rounded" onclick="plusSlides(1)" style="width: 5%;position: static;">Next</button></span>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  {% elif graphfile %}  
   <div class="row ">
     <div class="col-lg-12">
       <div class="card z-index-2">
@@ -45,7 +64,15 @@
           References<br>
           1. Virginia Department of Health, District Trajectory Map,
           <a href ="https://www.vdh.virginia.gov/coronavirus/see-the-numbers/covid-19-modeling/district-trajectory-map/" target="_blank">
-            https://www.vdh.virginia.gov/coronavirus/see-the-numbers/covid-19-modeling/district-trajectory-map/</a></code>
+            https://www.vdh.virginia.gov/coronavirus/see-the-numbers/covid-19-modeling/district-trajectory-map.</a><br>
+            Custom range
+          2. UVA Ensemble, FluSight experimental targets,<a href ="https://github.com/cdcepi/Flusight-forecast-data/tree/master/data-experimental/UVAFluX-Ensemble" target="_blank">
+            https://github.com/cdcepi/Flusight-forecast-data/tree/master/data-experimental/UVAFluX-Ensemble.</a><br>
+            
+           3. Adiga et al., Enhancing COVID-19 Ensemble Forecasting Model Performance Using Auxiliary
+            Data Sources, IEEE International Conference on Big Data, 2022.<br>
+            4. Adiga et al., Phase-Informed Bayesian Ensemble Models Improve Performance of COVID-19
+            Forecasts, Annual Conference on Innovative Applications of Artificial Intelligence (IAAI), 2023.</code>
         </div>
       </div>
     </div>

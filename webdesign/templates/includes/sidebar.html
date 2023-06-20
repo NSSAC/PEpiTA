@@ -17,20 +17,38 @@
             {% csrf_token %}
             <label>Select csv type:</label>
             <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
-              <span class="tooltip-text" style="top: -50px;right:100%;" id="right">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. </span>
+              <span class="tooltip-text" style="top: -50px;right:10%;" id="right">Single time series csvs contain a 'date' column and a 'value' column and
+                Multi time series csvs include a 'date' column; Other columns are treated as individual signals/regions.<br><br>
+                The time series is assumed to be incident (not cumulative). Select default frequency in the data as daily or weekly (used for imputation in preprocessing). <br><br>
+                Once uploaded, the most recent file is kept in memory until replaced by a newer/different file.
+                </span>
             </div>
-            
             <ul >
-              <li style="list-style-type: none;"><input type="radio" id="singletime" name="uploadtype" value="Single-time">
+              <li style="list-style-type: none;"><input type="radio" id="singletime" name="uploadtype" value="Singletime" onclick="displaySelect()" required>
                 <label >Single-time series </label></li>
-                <li style="list-style-type: none;"><input type="radio" id="multitime" name="uploadtype" value="Multi-time">
-                <label>Multi-time series </label></li>
+                <li style="list-style-type: none;"><input type="radio" id="multitime" name="uploadtype" value="Multitime" onclick="displaySelect()">
+                <label>Multi-time series </label><br>
+                  <!-- <ul>
+                    <li style="list-style-type: none;">
+                      <div style="display:none" id="multiseriestypetextdiv">
+                        <input type="radio" name="multiseriestype" id="multiseriestyperegions" value="multiseriestyperegions" >
+                        <label >Regions</label>
+                        <input type="radio" name="multiseriestype" id="multiseriestypesignals" value="multiseriestypesignals" checked>
+                        <label >Signals</label>
+                      </div>
+                    </li>
+                  </ul> -->
+              </li>
             <label>Frequency</label><br>
-                <input type="radio" id="daily" name="csvfrequency" value="daily">
+            <ul>
+              <li style="list-style-type: none;">
+                <input type="radio" id="daily" name="csvfrequency" value="D" required>
                   <label >Daily </label>
-                  <input type="radio" id="weekly" name="csvfrequency" value="weekly">
+                  <input type="radio" id="weekly" name="csvfrequency" value="W">
                   <label>Weekly </label>
-              </ul>
+              </li>
+            </ul>
+            </ul>
             <label class="text-black up bold mb-0 p-0 w-100">Upload csv file:</label>
             <div class="row content">
                 <div class="col">
@@ -65,7 +83,10 @@
       <div class="card-body text-start p-0 w-100">
             <label>Data Preprocess methods:</label>
             <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
-              <span class="tooltip-text" style="top: -100px;right: 100%;" id="right">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. </span>
+              <span class="tooltip-text" style="top: -100px;right: 100%;" id="right">"Fill dates" reindexes the time series based on frequency; <br><br>"Fill values" performs a linear interpolation (other methods will be added).
+                <br><br>"Smoothing" performs a rolling average over a specified window. 
+                
+                </span>
             </div>
               <ul>
                 <li style="list-style-type: none;"><input type="checkbox" id="fill_datesvalues"  name="datapreprocess" value="fill_datesvalues">
@@ -76,7 +97,7 @@
                     <li style="list-style-type: none;">
                       <label for="binsize" style="float: left;">Window:</label>
                       <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
-                        <input type="text" id="smoothingwindow" name="smoothingwindow" placeholder="7" style="width:50%;height:28px">
+                        <input type="text" id="smoothingwindow" name="smoothingwindow" placeholder="7" style="width:75%;height:28px">
                       </span>
                     </li></ul>
               </ul>
@@ -86,7 +107,13 @@
           <div class="card bg-light" id="sidenavCard3">
             <div class="card-body text-start p-0 w-100">
               <label>Data Categorize methods:</label>  <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
-                <span class="tooltip-text" style="top: -150px;right: 100%;" id="right">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. </span>
+                <span class="tooltip-text" style="top: -300px;right: 100%;width: 170px;" id="right">Users can customize the number of bins to categorize the data. Four methods are currently available for categorization. They are grouped into "Level Based" which work on the original time series,  and "Trend Based" which work on the first difference time series over a specified window.<br><br>
+                  L-cut: Creates specified number of bins with equal width<br>
+                  L-qcut: Creates specified number of bins using quantiles of the time series<br>
+                  T-rate: Generates the difference time series over a specified window and then categorizes using L-cut. <br>
+                  T-percent: Generates percentage change over a specified window and then categorizes using L-cut.<br><br>
+                  All methods use the [min, max] of the input time series for data range. This can be overridden by providing a custom bin range [min, max].
+                   </span>
               </div><br>
               <ul >
               <li style="list-style-type: none;">
@@ -95,7 +122,7 @@
                   <input type="text" id="binsize" name="binsize" placeholder="5" style="width:75%;height:28px">
                 </span>
               </li>
-              <li style="list-style-type: none;">
+       
                   <li style="list-style-type: none;"><input type="radio" id="categorizetypelevel" name="categorizetype" value="categorizetypelevel" onclick="displaySelect()" required>
                     <label >Level Based</label>
                     <select name="levelbasedtype" id="levelbasedtype" style="width:61%;height:30px;font-size:13px;padding-top:1px;display:none">
@@ -117,10 +144,10 @@
                       </span>
                     </div>
                     </li>
-              </li> 
+
               
               <li style="list-style-type: none;"><input type="checkbox" id="custombin"  name="custombin" value="custombin" onclick="displaySelect()">
-                <label for="custombin"> Custom Bin Size</label> </li>
+                <label for="custombin"> Custom Range</label> </li>
 
                 <div  id="customsizediv" style="float: left;display:none">
                   <label for="mincustomsize" style="float: left;">Min:</label>
@@ -134,7 +161,7 @@
                 </div>
               </ul>
               <div class="col"> 
-                <button id="submitmethod" name="methodsbutton" class="shadow-sm bg-white rounded  ">Run</a>
+                <button id="submitmethod" name="runbutton" class="shadow-sm bg-white rounded  ">Run</a>
               </div>
       </div>
     </div>

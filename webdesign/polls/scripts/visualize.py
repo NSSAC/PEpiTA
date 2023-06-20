@@ -1,16 +1,40 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import os
-import time
+from datetime import datetime
 
 plt.style.use('fast')
 plt.rcParams.update({'font.size': 16, 'font.family': 'sans-serif','font.sans-serif':'Verdana'})
 
-def single_ts_level_plot(pp_ts,cat_ts,bin_bounds):  ## use for levels
+def multi_signal_plot(cat_df, cat_method):
+    label = [x[0] for x in cat_df.values.flatten()][0]
+    
+    f,ax = plt.subplots(figsize=(20,8),facecolor='white')
+    if cat_method[0]=='categorizetypelevel':
+        cat_label = 'Level-based'
+    else:
+        cat_label = 'Trend-based'
+    plt.title('Multi signal - {} categories'.format(cat_label))
+    plt.ylabel('Categorical time series ({})'.format(label))
+    
+    cat_df.applymap(lambda x: int(x[1:])).plot(ax=ax,lw=2,drawstyle='steps')
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+
+    timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+    name = timestr+'.png'
+    save_path = os.getcwd() +'/media/figures/'+name 
+    f.savefig(save_path)
+    plt.close(f)  
+    return name 
+
+def single_ts_level_plot(pp_ts,cat_ts,bin_bounds, title=None):  ## use for levels
     label = cat_ts.values[0][0]
     
     f,ax = plt.subplots(figsize=(24,11),facecolor='white')
-    plt.title('Single time series - Level-based categories',fontsize=20)
+    if title:
+        plt.title(title+' - Level-based categories',fontsize=20)
+    else:
+        plt.title('Single time series - Level-based categories',fontsize=20)
     ax = plt.gca()
     
     pp_ts.plot(x='date',y='value',ax=ax,label='Preprocessed time series',color='C0',legend=False)
@@ -37,7 +61,7 @@ def single_ts_level_plot(pp_ts,cat_ts,bin_bounds):  ## use for levels
 
     # Add the second legend as usual
     ax2.legend(handles2, labels2,loc=1)
-    timestr = time.strftime("%Y%m%d-%H%M%S")
+    timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
     name = timestr+'.png'
     save_path = os.getcwd() +'/media/figures/'+name 
     f.savefig(save_path)
@@ -45,11 +69,14 @@ def single_ts_level_plot(pp_ts,cat_ts,bin_bounds):  ## use for levels
     return name 
 
 
-def single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds):  ## use for trends  
+def single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds, title=None):  ## use for trends  
     label = cat_ts.values[0][0]
     
     f,ax = plt.subplots(figsize=(24,11),facecolor='white')
-    plt.title('Single time series - Trend-based categories',fontsize=20)
+    if title:
+        plt.title(title+' - Level-based categories',fontsize=20)
+    else:
+        plt.title('Single time series - Trend-based categories',fontsize=20)
     
     ax = plt.gca()
     pp_ts.plot(x='date',y='value',ax=ax,label='Preprocessed time series',color='C0',legend=False)
@@ -87,7 +114,7 @@ def single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds):  ## use for trends
     # Add the second legend as usual
     ax3.legend(handles3, labels3,loc=1)
 
-    timestr = time.strftime("%Y%m%d-%H%M%S")
+    timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
     name = timestr+'.png'
     save_path = os.getcwd() +'/media/figures/'+name 
     f.savefig(save_path)
