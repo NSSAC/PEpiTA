@@ -15,6 +15,18 @@ function displaySelect(){
       else {
           document.getElementById("customsizediv").style.display = 'none';
       }
+      if (document.getElementById("fill_datesvalues").checked) {
+        document.getElementById("fillmethoddiv").style.display = '';
+      }
+      else {
+          document.getElementById("fillmethoddiv").style.display = 'none';
+      }
+      if (document.getElementById("smoothing").checked) {
+        document.getElementById("smoothingwindowdiv").style.display = '';
+      }
+      else {
+          document.getElementById("smoothingwindowdiv").style.display = 'none';
+      }
       // if (document.getElementById("multitime").checked) {
       //   document.getElementById("multiseriestypetextdiv").style.display = '';
       //   document.getElementById("custombin").disabled = true;

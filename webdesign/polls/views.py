@@ -56,6 +56,7 @@ def index(request):
             
             readfile(file_directory)
             context= {'csvname': csvname} 
+            context.update({'csvtype': csvtype} )
             context.update({'csvtime': datetime.utcfromtimestamp(csvtime)} )
             context.update( {'csvdata':input_ts.to_dict('records')}) 
         elif not uploaded_file.name.endswith('.csv'):
@@ -78,6 +79,7 @@ def index(request):
             cat_method=request.POST.getlist('categorizetype')
             num_bins = request.POST.get('binsize')
             win_size = request.POST.get('trendsize')
+            fill_method=request.POST.getlist('fillmethod')
 
             if(not smoothing_window):
                 smoothing_window = 7
@@ -91,6 +93,10 @@ def index(request):
                 win_size = 5
             else:
                 win_size = int(win_size)
+            if('forward' in fill_method):
+                fill_method = 'forward'
+            else:
+                fill_method = 'linear'
             minval=0
             maxval=50
             custom_range=()
@@ -114,7 +120,7 @@ def index(request):
             if(csvtype=='Singletime'):
                 workflow_type='single'
                 input_df = input_ts
-                name, cat_ts, df ,formdata = single_ts_workflow(input_df,request, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range)
+                name, cat_ts, df ,formdata = single_ts_workflow(input_df,request, fill_method, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range)
                 
                 context.update({'graphfile': name})
                 context.update({'qdata': json.loads(df.reset_index().to_json(orient='records'))})
@@ -139,9 +145,8 @@ def index(request):
                     signal_ts.columns = ['value']
 
                     input_df = signal_ts.reset_index()
-                    print("**"+column+"**")
-                    name, cat_tss, df ,formdata = single_ts_workflow(input_df, request, formdata, methods, freq, cat_method, 'single', smoothing_window, win_size, num_bins, custom_range, title=column)
-                    cat_ts = single_ts_workflow(input_df, request, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range)
+                    name, cat_tss, df ,formdata = single_ts_workflow(input_df, request, fill_method, formdata, methods, freq, cat_method, 'single', smoothing_window, win_size, num_bins, custom_range, title=column)
+                    cat_ts = single_ts_workflow(input_df, request, fill_method, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range)
                     cat_df = pd.concat([cat_df,cat_ts],axis=1)
                     imagelist.append({'name': name})
                     multidf.append({'eachdf':json.loads(df.reset_index().to_json(orient='records')),'name':column})
@@ -198,13 +203,13 @@ def csvtables(request):
         return render(request, 'pages/csvtables.html',context)
     
 
-def single_ts_workflow(input_df, request, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range, title=None):
+def single_ts_workflow(input_df, request, fill_method, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range, title=None):
     global pp_ts
     if 'fill_datesvalues' in methods:
-        fill_method = 'linear'
         pp_ts = preprocess.fill_dates(input_df, freq)
         pp_ts = preprocess.fill_values(pp_ts, fill_method)
         formdata['fill_datesvalues'] = 'checked'
+        formdata['fill_method'] = fill_method+'fill'
     if 'smoothing' in methods :
         if pp_ts.empty:
                 pp_ts = input_df

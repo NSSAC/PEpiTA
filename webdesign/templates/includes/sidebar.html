@@ -1,13 +1,17 @@
 {% load static %}
 
-<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-4 fixed-start ms-4 " id="sidenav-main">
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-4 fixed-start ms-4 "
+  id="sidenav-main">
   <div class="sidenav-header">
-    <i class="fas fa-times p-4 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-  <a class="navbar-brand m-0" href="{% url 'index' %}">
+    <i class="fas fa-times p-4 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+      aria-hidden="true" id="iconSidenav"></i>
+    <a class="navbar-brand m-0" href="{% url 'index' %}">
       <!-- <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo"> -->
-      <span class="font-weight-bold"><h4>PEpiTA</h4></span>
+      <span class="font-weight-bold">
+        <h4>PEpiTA</h4>
+      </span>
     </a>
-  
+
   </div>
   <div class="sidenav-footer mx-3 ">
     <div class="card bg-light" id="sidenavCard">
@@ -17,18 +21,24 @@
             {% csrf_token %}
             <label>Select csv type:</label>
             <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
-              <span class="tooltip-text" style="top: -50px;right:10%;" id="right">Single time series csvs contain a 'date' column and a 'value' column and
-                Multi time series csvs include a 'date' column; Other columns are treated as individual signals/regions.<br><br>
-                The time series is assumed to be incident (not cumulative). Select default frequency in the data as daily or weekly (used for imputation in preprocessing). <br><br>
+              <span class="tooltip-text" style="top: -50px;right:10%;" id="right">Single time series csvs contain a
+                'date' column and a 'value' column and
+                Multi time series csvs include a 'date' column; Other columns are treated as individual
+                signals/regions.<br><br>
+                The time series is assumed to be incident (not cumulative). Select default frequency in the data as
+                daily or weekly (used for imputation in preprocessing). <br><br>
                 Once uploaded, the most recent file is kept in memory until replaced by a newer/different file.
-                </span>
+              </span>
             </div>
-            <ul >
-              <li style="list-style-type: none;"><input type="radio" id="singletime" name="uploadtype" value="Singletime" onclick="displaySelect()" required>
-                <label >Single-time series </label></li>
-                <li style="list-style-type: none;"><input type="radio" id="multitime" name="uploadtype" value="Multitime" onclick="displaySelect()">
+            <ul>
+              <li style="list-style-type: none;"><input type="radio" id="singletime" name="uploadtype"
+                  value="Singletime" onclick="displaySelect()" required>
+                <label>Single-time series </label>
+              </li>
+              <li style="list-style-type: none;"><input type="radio" id="multitime" name="uploadtype" value="Multitime"
+                  onclick="displaySelect()">
                 <label>Multi-time series </label><br>
-                  <!-- <ul>
+                <!-- <ul>
                     <li style="list-style-type: none;">
                       <div style="display:none" id="multiseriestypetextdiv">
                         <input type="radio" name="multiseriestype" id="multiseriestyperegions" value="multiseriestyperegions" >
@@ -39,142 +49,182 @@
                     </li>
                   </ul> -->
               </li>
-            <label>Frequency</label><br>
-            <ul>
-              <li style="list-style-type: none;">
-                <input type="radio" id="daily" name="csvfrequency" value="D" required>
-                  <label >Daily </label>
+              <label>Frequency</label><br>
+              <ul>
+                <li style="list-style-type: none;">
+                  <input type="radio" id="daily" name="csvfrequency" value="D" required>
+                  <label>Daily </label>
                   <input type="radio" id="weekly" name="csvfrequency" value="W">
                   <label>Weekly </label>
-              </li>
-            </ul>
+                </li>
+              </ul>
             </ul>
             <label class="text-black up bold mb-0 p-0 w-100">Upload csv file:</label>
             <div class="row content">
-                <div class="col">
-                    <input type="file" class="btn btn-sm shadow-sm bg-white p-0 m-50" name="document" style="max-width:200px" id="document" required="required">
-                </div>
-                 <div class="col">
-                  <button id="submit" name="uploadbutton" class="shadow-sm bg-white rounded  ">Click to upload</a>
-                </div>
+              <div class="col">
+                <input type="file" class="btn btn-sm shadow-sm bg-white p-0 m-50" name="document"
+                  style="max-width:200px" id="document" required="required">
+              </div>
+              <div class="col">
+                <button id="submit" name="uploadbutton" class="shadow-sm bg-white rounded  ">Click to upload</a>
+              </div>
             </div>
-        </form>
+          </form>
         </div>
       </div>
     </div>
-  {% if csvname %} 
-  <div>
-    <code>File in memory: {{csvname}}</code>
-    <code>Last Updated: {{csvtime}}</code>
-  </div>
-  {% elif messages %}
-  <div class="container" style="color: firebrick; margin-top: 20px" >
-  {% for message in messages %}
-      {{ message }}
-  {% endfor %}
-  </div>
-  {% else %}
-  &nbsp;
-  {% endif %}
-
-   <form action="" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="card bg-light" id="sidenavCard2">
-      <div class="card-body text-start p-0 w-100">
-            <label>Data Preprocess methods:</label>
-            <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
-              <span class="tooltip-text" style="top: -100px;right: 100%;" id="right">"Fill dates" reindexes the time series based on frequency; <br><br>"Fill values" performs a linear interpolation (other methods will be added).
-                <br><br>"Smoothing" performs a rolling average over a specified window. 
-                
-                </span>
-            </div>
-              <ul>
-                <li style="list-style-type: none;"><input type="checkbox" id="fill_datesvalues"  name="datapreprocess" value="fill_datesvalues">
-                  <label for="fill_dates"> Fill Dates/Values</label></li>
-                <li style="list-style-type: none;"><input type="checkbox" id="smoothing"  name="datapreprocess" value="smoothing">
-                  <label for="smoothing"> Smoothing</label></li>
-                  <ul>
-                    <li style="list-style-type: none;">
-                      <label for="binsize" style="float: left;">Window:</label>
-                      <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
-                        <input type="text" id="smoothingwindow" name="smoothingwindow" placeholder="7" style="width:75%;height:28px">
-                      </span>
-                    </li></ul>
-              </ul>
-            </div>
-          </div>
-          &nbsp;
-          <div class="card bg-light" id="sidenavCard3">
-            <div class="card-body text-start p-0 w-100">
-              <label>Data Categorize methods:</label>  <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
-                <span class="tooltip-text" style="top: -300px;right: 100%;width: 170px;" id="right">Users can customize the number of bins to categorize the data. Four methods are currently available for categorization. They are grouped into "Level Based" which work on the original time series,  and "Trend Based" which work on the first difference time series over a specified window.<br><br>
-                  L-cut: Creates specified number of bins with equal width<br>
-                  L-qcut: Creates specified number of bins using quantiles of the time series<br>
-                  T-rate: Generates the difference time series over a specified window and then categorizes using L-cut. <br>
-                  T-percent: Generates percentage change over a specified window and then categorizes using L-cut.<br><br>
-                  All methods use the [min, max] of the input time series for data range. This can be overridden by providing a custom bin range [min, max].
-                   </span>
-              </div><br>
-              <ul >
-              <li style="list-style-type: none;">
-                <label for="binsize" style="float: left;">Number of Bins:</label>
-                <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
-                  <input type="text" id="binsize" name="binsize" placeholder="5" style="width:75%;height:28px">
-                </span>
-              </li>
-       
-                  <li style="list-style-type: none;"><input type="radio" id="categorizetypelevel" name="categorizetype" value="categorizetypelevel" onclick="displaySelect()" required>
-                    <label >Level Based</label>
-                    <select name="levelbasedtype" id="levelbasedtype" style="width:61%;height:30px;font-size:13px;padding-top:1px;display:none">
-                      <option value="L-cut">L-cut</option>
-                      <option value="L-qcut">L-qcut</option>
-                  </select></li>
-
-                  <li style="list-style-type: none;"><input type="radio" id="categorizetypetrend" name="categorizetype" value="categorizetypetrend" onclick="displaySelect()">
-                      <label >Trend Based</label>
-                      <select name="trendbasedtype" id="trendbasedtype" style="width:63%;height:30px;font-size:13px;padding-top:1px;display:none">
-                        <option value="T-rate">T-rate</option>
-                        <option value="T-percent">T-percent</option>
-                    </select></li>
-                    <li style="list-style-type: none;">
-                      <div style="display:none" id="trendbasedtypetextdiv">
-                      <label for="trendsize" style="float: left;">Trend window:</label>
-                      <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
-                        <input type="text" id="trendsize" name="trendsize" placeholder="5" style="width:75%;height:28px">
-                      </span>
-                    </div>
-                    </li>
-
-              
-              <li style="list-style-type: none;"><input type="checkbox" id="custombin"  name="custombin" value="custombin" onclick="displaySelect()">
-                <label for="custombin"> Custom Range</label> </li>
-
-                <div  id="customsizediv" style="float: left;display:none">
-                  <label for="mincustomsize" style="float: left;">Min:</label>
-                  <span style="display: block; overflow: hidden; padding: 0 2px 0 2px; float: left; ">
-                    <input type="text" id="mincustomsize" name="mincustomsize" placeholder="0" style="width:50px;height:28px">
-                  </span>
-                  <label for="maxcustomsize" style="float: left;">Max:</label>
-                  <span style="display: block; overflow: hidden; padding: 0 2px 0 2px;">
-                    <input type="text" id="maxcustomsize" name="maxcustomsize" placeholder="50" style="width:50px;height:28px">
-                  </span>
-                </div>
-              </ul>
-              <div class="col"> 
-                <button id="submitmethod" name="runbutton" class="shadow-sm bg-white rounded  ">Run</a>
-              </div>
-      </div>
+    {% if csvname %}
+    <div>
+      <code>File in memory: {{csvname}}</code>
+      <code>Last Updated: {{csvtime}}</code>
     </div>
-  </form> 
-
-  {% block messages %}
-  {% if messages %}
-      <div class="container" style="color: firebrick; margin-top: 20px" >
+    {% elif messages %}
+    <div class="container" style="color: firebrick; margin-top: 20px">
       {% for message in messages %}
-          {{ message }}
+      {{ message }}
       {% endfor %}
+    </div>
+    {% else %}
+    &nbsp;
+    {% endif %}
+
+    <form action="" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="card bg-light" id="sidenavCard2">
+        <div class="card-body text-start p-0 w-100">
+          <label>Data Preprocess methods:</label>
+          <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
+            <span class="tooltip-text" style="top: -100px;right: 100%;" id="right">"Fill dates" reindexes the time
+              series based on frequency; <br><br>"Fill values" performs a linear interpolation (other methods will be
+              added).
+              <br><br>"Smoothing" performs a rolling average over a specified window.
+            </span>
+          </div>
+          <ul>
+            <li style="list-style-type: none;"><input type="checkbox" id="fill_datesvalues" name="datapreprocess"
+                value="fill_datesvalues" onclick="displaySelect()">
+              <label for="fill_dates"> Fill Dates/Values</label>
+            </li>
+            <div id="fillmethoddiv" style="float: left;display:none">
+              <label>Method</label><br>
+              <ul>
+                <li style="list-style-type: none;">
+                  <input type="radio" id="linearfill" name="fillmethod" value="linear">
+                  <label>Linear </label>
+                  <input type="radio" id="forwardfill" name="fillmethod" value="forward">
+                  <label>Forward </label>
+                </li>
+              </ul>
+            </div>
+
+            <li style="list-style-type: none;"><input type="checkbox" id="smoothing" name="datapreprocess"
+                value="smoothing" onclick="displaySelect()">
+              <label for="smoothing"> Smoothing</label>
+            </li>
+            <div id="smoothingwindowdiv" style="float: left;display:none">
+              <ul>
+                <li style="list-style-type: none;">
+                  <label for="binsize" style="float: left;">Window:</label>
+                  <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
+                    <input type="text" id="smoothingwindow" name="smoothingwindow" placeholder="7"
+                      style="width:75%;height:28px">
+                  </span>
+                </li>
+              </ul>
+
+            </div>
+
+          </ul>
+        </div>
       </div>
-  {% endif %}
-{% endblock %}
+      &nbsp;
+      <div class="card bg-light" id="sidenavCard3">
+        <div class="card-body text-start p-0 w-100">
+          <label>Data Categorize methods:</label>
+          <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
+            <span class="tooltip-text" style="top: -300px;right: 100%;width: 170px;" id="right">Users can customize the
+              number of bins to categorize the data. Four methods are currently available for categorization. They are
+              grouped into "Level Based" which work on the original time series, and "Trend Based" which work on the
+              first difference time series over a specified window.<br><br>
+              L-cut: Creates specified number of bins with equal width<br>
+              L-qcut: Creates specified number of bins using quantiles of the time series<br>
+              T-rate: Generates the difference time series over a specified window and then categorizes using L-cut.
+              <br>
+              T-percent: Generates percentage change over a specified window and then categorizes using L-cut.<br><br>
+              All methods use the [min, max] of the input time series for data range. This can be overridden by
+              providing a custom bin range [min, max].
+            </span>
+          </div><br>
+          <ul>
+            <li style="list-style-type: none;">
+              <label for="binsize" style="float: left;">Number of Bins:</label>
+              <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
+                <input type="text" id="binsize" name="binsize" placeholder="5" style="width:75%;height:28px">
+              </span>
+            </li>
+
+            <li style="list-style-type: none;"><input type="radio" id="categorizetypelevel" name="categorizetype"
+                value="categorizetypelevel" onclick="displaySelect()" required>
+              <label>Level Based</label>
+              <select name="levelbasedtype" id="levelbasedtype"
+                style="width:61%;height:30px;font-size:13px;padding-top:1px;display:none">
+                <option value="L-cut">L-cut</option>
+                <option value="L-qcut">L-qcut</option>
+              </select>
+            </li>
+
+            <li style="list-style-type: none;"><input type="radio" id="categorizetypetrend" name="categorizetype"
+                value="categorizetypetrend" onclick="displaySelect()">
+              <label>Trend Based</label>
+              <select name="trendbasedtype" id="trendbasedtype"
+                style="width:63%;height:30px;font-size:13px;padding-top:1px;display:none">
+                <option value="T-rate">T-rate</option>
+                <option value="T-percent">T-percent</option>
+              </select>
+            </li>
+            <li style="list-style-type: none;">
+              <div style="display:none" id="trendbasedtypetextdiv">
+                <label for="trendsize" style="float: left;">Trend window:</label>
+                <span style="display: block; overflow: hidden; padding: 0 4px 0 6px;">
+                  <input type="text" id="trendsize" name="trendsize" placeholder="5" style="width:75%;height:28px">
+                </span>
+              </div>
+            </li>
+
+
+            <li style="list-style-type: none;"><input type="checkbox" id="custombin" name="custombin" value="custombin"
+                onclick="displaySelect()">
+              <label for="custombin"> Custom Range</label>
+            </li>
+
+            <div id="customsizediv" style="float: left;display:none">
+              <label for="mincustomsize" style="float: left;">Min:</label>
+              <span style="display: block; overflow: hidden; padding: 0 2px 0 2px; float: left; ">
+                <input type="text" id="mincustomsize" name="mincustomsize" placeholder="0"
+                  style="width:50px;height:28px">
+              </span>
+              <label for="maxcustomsize" style="float: left;">Max:</label>
+              <span style="display: block; overflow: hidden; padding: 0 2px 0 2px;">
+                <input type="text" id="maxcustomsize" name="maxcustomsize" placeholder="50"
+                  style="width:50px;height:28px">
+              </span>
+            </div>
+          </ul>
+          <div class="col">
+            <button id="submitmethod" name="runbutton" class="shadow-sm bg-white rounded  ">Run</a>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    {% block messages %}
+    {% if messages %}
+    <div class="container" style="color: firebrick; margin-top: 20px">
+      {% for message in messages %}
+      {{ message }}
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endblock %}
 
 </aside>
