@@ -9,7 +9,7 @@
 {% block content %}
 
 <div class="container-fluid py-4">
-  {% if imagelist and 'Multitime' in csvtype %}  
+  {% if imagelist and 'Multitime' in csvtype %}
   <div class="row ">
     <div class="col-lg-12">
       <div class="card z-index-2">
@@ -18,24 +18,26 @@
         </div>
         {% for i in imagelist %}
         <div class="photos" style="position: relative;margin: auto;">
-          <img class="slides" src="/media/figures/{{i.name}}" alt="Graph" style="display: none;animation-name: fade;animation-duration: 1.5s;width:1100px;height:550px;">
+          <img class="slides" src="/media/figures/{{i.name}}" alt="Graph"
+            style="display: none;animation-name: fade;animation-duration: 1.5s;width:1100px;height:550px;">
         </div>
         {% endfor %}
-        <span><button name="button" class="shadow-sm bg-white rounded" onclick="plusSlides(-1)" style="width: 5%;position: static;">Prev</button>
-          <button name="button" class="shadow-sm bg-white rounded" onclick="plusSlides(1)" style="width: 5%;position: static;">Next</button></span>
-      </div>
+        <span><button name="button" class="shadow-sm bg-white rounded" onclick="plusSlides(-1)"
+            style="width: 5%;position: static;">Prev</button>
+          <button name="button" class="shadow-sm bg-white rounded" onclick="plusSlides(1)"
+            style="width: 5%;position: static;">Next</button></span>
       </div>
     </div>
   </div>
 
-  {% elif graphfile %}  
+  {% elif graphfile %}
   <div class="row ">
     <div class="col-lg-12">
       <div class="card z-index-2">
         <div class="card-header pb-0">
           <h6>Graph [<a href="/media/figures/{{graphfile}}" class="fas fa-download text-black p-2" download></a>]</h6>
         </div>
-            <img src="/media/figures/{{graphfile}}" alt="Graph" style="width:1100px;height:550px;">
+        <img src="/media/figures/{{graphfile}}" alt="Graph" style="width:1100px;height:550px;">
       </div>
     </div>
   </div>
@@ -44,7 +46,7 @@
     <div class="col-lg-12">
       <div class="card z-index-2">
         <div class="card-header pb-4">
-        <code style="color:rgb(138, 89, 89)"> Phase-based Epidemic Time series Analyzer(PEpiTA) is an interactive tool for public health
+          <code style="color:rgb(138, 89, 89)"> Phase-based Epidemic Time series Analyzer(PEpiTA) is an interactive tool for public health
           practitioners to extract insights from time series data related to ongoing epidemic outbreaks.<br><br>
           Specifically, the tool will allow users to select a time series of epidemiological significance and
           extract categorical indicators of activity over time. These categories could either be based 
@@ -69,7 +71,7 @@
           2. UVA Ensemble, FluSight experimental targets,<a href ="https://github.com/cdcepi/Flusight-forecast-data/tree/master/data-experimental/UVAFluX-Ensemble" target="_blank">
             https://github.com/cdcepi/Flusight-forecast-data/tree/master/data-experimental/UVAFluX-Ensemble.</a><br>
             
-           3. Adiga et al., Enhancing COVID-19 Ensemble Forecasting Model Performance Using Auxiliary
+          3. Adiga et al., Enhancing COVID-19 Ensemble Forecasting Model Performance Using Auxiliary
             Data Sources, IEEE International Conference on Big Data, 2022.<br>
             4. Adiga et al., Phase-Informed Bayesian Ensemble Models Improve Performance of COVID-19
             Forecasts, Annual Conference on Innovative Applications of Artificial Intelligence (IAAI), 2023.</code>
@@ -79,56 +81,116 @@
   </div>
 
   {% endif %}
-
-  <!-- {% if chartspec %} 
   <div class="row mt-4">
-    <div class="col-lg-12">
-      <div class="card z-index-2">
-        <div class="card-header pb-0">
-          <h6>Interactive Chart [work in progress..]</h6>
-        </div>
-          <div id="chartId"></div>
-  </div>
-  {% endif %} -->
-
-  {% if qdata %}
-  <div class="row mt-4">
+    {% if qdata and 'Multitime' in csvtype %}
     <div class="col-12">
       <div class="card mb-3">
         <div class="card-header pb-0">
-          <h6>Analytical summary [<a href="/media/analytical_summary/{{analyticalsummary}}" class="fas fa-download text-black p-2" download></a>]</h6>
+          <h6>Analytical summary [<a href="/media/zip/{{multicsvzip}}"  class="fas fa-download text-black p-2" download></a>]</h6>
+        </div>
+        {% for each in qdata %}
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0">
+            <div style="height: 260px; overflow-y: auto;display:block">
+            <table class="table align-items-center justify-content-center mb-0">
+              <p class="align-left text-xs font-weight-bolder opacity-10" style="padding-left: 2%;">Column Name:
+                {{each.name}}</p>
+              <thead >
+                <th
+                  class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10"  >
+                  Category</th>
+                <th
+                  class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10" >
+                  Bin Boundaries</th>
+                <th
+                  class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10" >
+                  Number of Occurrences</th>
+                <th
+                  class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10" >
+                  Percent Time Spent</th>
+                <th
+                  class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10" >
+                  Average Duration Spent</th>
+                </tr>
+              </thead>
+              <tbody >
+                {% for i in each.eachdf %}
+                <tr >
+                  <td class="align-middle text-center" >
+                    <h6 class="mb-0 text-sm">{{i.category}}</h6>
+                  </td>
+                  <td class="align-middle text-center" >
+                    <h6 class="mb-0 text-sm">{{i.bin_boundaries}}</h6>
+                  </td>
+                  <td class="align-middle text-center" >
+                    <h6 class="mb-0 text-sm">{{i.number_of_occurrences}}</h6>
+                  </td>
+                  <td class="align-middle text-center" >
+                    <h6 class="mb-0 text-sm">{{i.percent_time_spent}}</h6>
+                  </td>
+                  <td class="align-middle text-center">
+                    <h6 class="mb-0 text-sm">{{i.average_duration_spent}}</h6>
+                  </td>
+                  
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+        <br><br>
+        {% endfor %}
+      </div>
+    </div>
+    {% elif qdata and 'Singletime' in csvtype %}
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-header pb-0">
+          <h6>Analytical summary [<a href="/media/analytical_summary/{{analyticalsummary}}"
+              class="fas fa-download text-black p-2" download></a>]</h6>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0">
             <table class="table align-items-center justify-content-center mb-0">
-              <thead >
+              <thead>
                 <tr>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Category</th>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Bin Boundaries</th>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Number of Occurrences</th>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Percent Time Spent</th>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Average Duration Spent</th>
+                  <th
+                    class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">
+                    Category</th>
+                  <th
+                    class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">
+                    Bin Boundaries</th>
+                  <th
+                    class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">
+                    Number of Occurrences</th>
+                  <th
+                    class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">
+                    Percent Time Spent</th>
+                  <th
+                    class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">
+                    Average Duration Spent</th>
                 </tr>
               </thead>
               <tbody>
                 {% for i in qdata %}
-                <tr >
+                <tr>
                   <td class="align-middle text-center">
                     <h6 class="mb-0 text-sm">{{i.category}}</h6>
                   </td>
                   <td class="align-middle text-center">
                     <h6 class="mb-0 text-sm">{{i.bin_boundaries}}</h6>
-                </td>
-                <td class="align-middle text-center">
-                  <h6 class="mb-0 text-sm">{{i.number_of_occurrences}}</h6>
-                 
-              </td>
-              <td class="align-middle text-center" >
-                <h6 class="mb-0 text-sm">{{i.percent_time_spent}}</h6>
-            </td>
-            <td class="align-middle text-center" >
-              <h6 class="mb-0 text-sm">{{i.average_duration_spent}}</h6>
-          </td>
+                  </td>
+                  <td class="align-middle text-center">
+                    <h6 class="mb-0 text-sm">{{i.number_of_occurrences}}</h6>
+
+                  </td>
+                  <td class="align-middle text-center">
+                    <h6 class="mb-0 text-sm">{{i.percent_time_spent}}</h6>
+                  </td>
+                  <td class="align-middle text-center">
+                    <h6 class="mb-0 text-sm">{{i.average_duration_spent}}</h6>
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -137,11 +199,12 @@
         </div>
       </div>
     </div>
-  
+
     {% endif %}
     {% if catdownload %}
-      <h6>Download Categorical Time Series csv [<a href="/media/categorize_output/{{catdownload}}" class="fas fa-download text-black p-2" download></a>]</h6>
-      
+    <h6>Download Categorical Time Series csv [<a href="/media/categorize_output/{{catdownload}}"
+        class="fas fa-download text-black p-2" download></a>]</h6>
+
   </div>
   {% include "includes/footer.html" %}
   {% endif %}

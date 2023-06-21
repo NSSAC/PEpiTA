@@ -109,6 +109,8 @@ def index(request):
             formdata['binsize'] = num_bins  
 
             imagelist = []
+            multidf=[]
+            multidflist=[]
             if(csvtype=='Singletime'):
                 workflow_type='single'
                 input_df = input_ts
@@ -142,14 +144,32 @@ def index(request):
                     cat_ts = single_ts_workflow(input_df, request, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range)
                     cat_df = pd.concat([cat_df,cat_ts],axis=1)
                     imagelist.append({'name': name})
+                    multidf.append({'eachdf':json.loads(df.reset_index().to_json(orient='records')),'name':column})
+                    
+                    timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+                    name=timestr+'_analyticalsummary_'+column+'.csv' 
+                    save_path = os.getcwd() +'/media/analytical_summary/'+name
+                    df.to_csv(save_path) 
+                    multidflist.append({'name': name})
+                    
+
                 cat_df.columns = input_ts.columns
                 name = visualize.multi_signal_plot(cat_df, cat_method)
                 imagelist.insert(0, {'name': name})
-                multiimagezip=zipfiles(imagelist)
-                
+                multiimagezip=zipfiles(imagelist,'images','media/figures/')
                 context.update( {'multiimagezip':multiimagezip})
+
+                context.update({'qdata': multidf})
+                multicsvzip=zipfiles(multidflist,'csv','media/analytical_summary/')
+                context.update( {'multicsvzip':multicsvzip})
+                
                 context.update( {'csvtype':'Multitime'})
                 context.update({'imagelist':imagelist})
+                timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+                name=timestr+'_catdownload.csv' 
+                save_path = os.getcwd() +'/media/categorize_output/'+name
+                cat_df.to_csv(save_path) 
+                context.update( {'catdownload': name} )
            
             context.update( {'formdata': json.dumps(formdata)} )
             context.update( {'csvdata':input_ts.to_dict('records')})
@@ -227,13 +247,13 @@ def single_ts_workflow(input_df, request, formdata, methods, freq, cat_method, w
     else:
         return cat_ts
     
-def zipfiles(filenames):
-    name=datetime.utcnow().strftime('%Y%m%d%H%M%S%f')+'_images.zip'
+def zipfiles(filenames, tag, path):
+    name=datetime.utcnow().strftime('%Y%m%d%H%M%S%f')+'_'+tag+'.zip'
     spath=os.getcwd() +'/media/zip/'+name
 
     with zipfile.ZipFile(spath, 'w') as z:
         for i in filenames:
-            fpath='media/figures/'+i['name']
+            fpath=path+i['name']
             z.write(fpath)
     z.close()
     return name
