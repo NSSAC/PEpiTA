@@ -45,7 +45,7 @@ def single_ts_level_plot(pp_ts,cat_ts,bin_bounds, title=None):  ## use for level
     ax.set_ylabel('Time series values',color='C0')
 
     ax2 = ax.twinx()
-    cat_ts.apply(lambda x: int(x[1:])).astype(int).plot(ax=ax2,color='k',lw=2,label='Categorical time series')
+    cat_ts.apply(lambda x: int(x[1:])).astype(int).plot(ax=ax2,color='k',lw=2,drawstyle='steps',label='Categorical time series')
     ax2.spines['left'].set_color('C0')
     ax2.spines['right'].set_linewidth(2)
     ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -93,7 +93,7 @@ def single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds, title=None):  ## use 
     ax2.set_ylabel('Trend time series',color='C1')
     
     ax3 = ax.twinx()
-    cat_ts.apply(lambda x: int(x[1:])).astype(int).plot(ax=ax3,color='k',lw=2,label='Categorical time series')
+    cat_ts.apply(lambda x: int(x[1:])).astype(int).plot(ax=ax3,color='k',lw=2,drawstyle='steps',label='Categorical time series')
     ax3.spines["right"].set_position(("axes", 1.1))
     ax3.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax3.spines['right'].set_linewidth(2)
@@ -136,7 +136,7 @@ def single_ts_level_plot_nosave(pp_ts,cat_ts,bin_bounds):  ## use for levels
     ax.set_ylabel('Time series values',color='C0')
 
     ax2 = ax.twinx()
-    cat_ts.apply(lambda x: int(x[1:])).astype(int).plot(ax=ax2,color='k',lw=2,label='Categorical time series')
+    cat_ts.apply(lambda x: int(x[1:])).astype(int).plot(ax=ax2,color='k',lw=2,drawstyle='steps',label='Categorical time series')
     ax2.spines['left'].set_color('C0')
     ax2.spines['right'].set_linewidth(2)
     ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -175,7 +175,7 @@ def single_ts_trend_plot_nosave(pp_ts,trend_ts,cat_ts,bin_bounds):  ## use for t
     ax2.set_ylabel('Trend time series',color='C1')
     
     ax3 = ax.twinx()
-    cat_ts.apply(lambda x: int(x[1:])).astype(int).plot(ax=ax3,color='k',lw=2,label='Categorical time series')
+    cat_ts.apply(lambda x: int(x[1:])).astype(int).plot(ax=ax3,color='k',lw=2,drawstyle='steps',label='Categorical time series')
     ax3.spines["right"].set_position(("axes", 1.1))
     ax3.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax3.spines['right'].set_linewidth(2)

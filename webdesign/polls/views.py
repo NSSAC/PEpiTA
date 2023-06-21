@@ -219,9 +219,9 @@ def single_ts_workflow(input_df, request, formdata, methods, freq, cat_method, w
 
     if workflow_type == 'single':
         if(cat_method[0] == 'categorizetypelevel'):
-            name = visualize.single_ts_level_plot(pp_ts, cat_ts, bin_bounds)
+            name = visualize.single_ts_level_plot(pp_ts, cat_ts, bin_bounds,title)
         elif(cat_method[0] == 'categorizetypetrend'):
-            name = visualize.single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds)
+            name = visualize.single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds,title)
         
         return name, cat_ts, pd.DataFrame( analyze.single_ts_analyze(cat_ts, bin_bounds, freq)), formdata
     else:

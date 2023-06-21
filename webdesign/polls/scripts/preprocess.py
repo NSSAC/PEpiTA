@@ -20,7 +20,7 @@ def fill_values(ts, fill_method):
     if fill_method == 'forward':
         pp_ts = ts.set_index('date').fillna(method='ffill').reset_index() ### fillna (forward)
     if fill_method == 'linear':
-        pp_ts = ts.set_index('date').interpolate(method='linear').round().reset_index() ### fillna (linear)
+        pp_ts = ts.set_index('date').interpolate(method='linear').reset_index() ### fillna (linear)
     return pp_ts
 
 def smoothing(ts, window):
