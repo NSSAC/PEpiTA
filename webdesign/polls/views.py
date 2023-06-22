@@ -11,7 +11,6 @@ from .scripts import preprocess
 from .scripts import analyze
 from .scripts import categorize
 from .scripts import visualize
-import altair as alt 
 import numpy as np
 import zipfile
 
