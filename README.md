@@ -11,7 +11,7 @@ Open a terminal on the PEpiTA folder and follow these commands:
 
 
 #### <code>If deploying the webApp for the first time, please run the below command as well
-2. python manage.py migrate</code><br>
+2. python manage.py migrate</code>
 
 3. python manage.py runserver
 
