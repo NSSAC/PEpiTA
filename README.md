@@ -10,8 +10,7 @@ Open a terminal on the PEpiTA folder and follow these commands:
 1. cd webdesign <br/>
 
 
-#### <code>If deploying the webApp for the first time, please run the below command as well</code>
-<code>
+#### <code>If deploying the webApp for the first time, please run the below command as well<br>
 2. python manage.py migrate<br>
 </code>
 
