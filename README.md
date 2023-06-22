@@ -6,11 +6,11 @@ Phase-based Epidemic Time series Analyzer.
 pip install -r requirements.txt
 
 ## Running Server on localhost(http://localhost:8000/)
-Open a terminal on the PEpiTA folder and follow these commands:
+Open a terminal on the PEpiTA folder and follow these commands:<br>
 1. cd webdesign <br>
 
 <code> # If deploying the webApp for the first time, please run the below command as well
-2. python manage.py migrate
+ 2. python manage.py migrate
 </code>
 <br>
 3. python manage.py runserver
