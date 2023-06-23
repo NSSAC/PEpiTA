@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/626968215.svg)](https://zenodo.org/badge/latestdoi/626968215)
+
+
 # PEpiTA
 Phase-based Epidemic Time series Analyzer.
 
