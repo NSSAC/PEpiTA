@@ -89,12 +89,16 @@
 
 {{ formdata|json_script:"formdata" }}
 {{ imagelist|json_script:"imagelist" }}
+{{ currentpath|json_script:"currentpath" }}
+
 
  <script>
 const imagelist = JSON.parse(document.getElementById('imagelist').textContent);
 
+var currPath=JSON.parse(document.getElementById('currentpath').textContent);
+
 let slideIndex = 1;
-if(imagelist !== "") {
+if(imagelist !== "" && currPath !=='csvtables') {
   showSlides(slideIndex);
 }
 

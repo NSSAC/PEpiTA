@@ -4,41 +4,51 @@
 
 {% block script %}
 {% endblock %}
-
-
 {% block content %}
 
 <div class="container-fluid py-4">
-  <div class="row mt-3">
-    {% if csvdata %}
-    <div class="col-6">
+  <div class="row mt-2">
+    {% if csvdata%}
+    <div class="col-10">
       <div class="card mb-4">
         <div class="card-header pb-0">
           <h6>CSV ({{csvname}}) raw data</h6>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
-          <div class="table-responsive p-0" >
+          <div class="table-responsive p-0">
             <div style="height: 350px; overflow-y: scroll;">
-            <table class="table align-items-center justify-content-center mb-0" >
-              <thead>
-                <tr>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Date</th>
-                  <th class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for i in csvdata %}
-                <tr>
-                  <td class="align-middle text-center">
-                    <h6 class="mb-0 text-sm">{{i.date|date:"SHORT_DATE_FORMAT"}}</h6>
-                  </td>
-                  <td class="align-middle text-center">
-                    <h6 class="mb-0 text-sm">{{i.value}}</h6>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+
+              <table class="table align-items-center justify-content-center mb-0">
+                <thead>
+                  <tr>
+                    {% for th in csvdataheaders %}
+                    <th
+                      class="align-middle text-center text-uppercase text-secondary text-xs font-weight-bolder opacity-10">
+                      {{ th.column }}</th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for bd in csvdata %}
+                  <tr>
+                    {% for h in csvdataheaders %}
+                    {% with h.column as key %}
+                    {%if 'date' in h.column%}
+                    <td class="align-middle text-center">
+                      <h6 class="mb-0 text-sm">{{bd|get_dict_item:key|date:"SHORT_DATE_FORMAT"}}</h6>
+                    </td>
+                    {% else %}
+                    <td class="align-middle text-center">
+                      <h6 class="mb-0 text-sm">{{ bd|get_dict_item:key }}</h6>
+                    </td>
+                    {% endif %}
+                    {% endwith %}
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

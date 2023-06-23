@@ -13,7 +13,7 @@
       <span class="d-sm-inline d-none">Back to Analysis</span>
     </a>
   </div>
-  {% elif csvdata and 'Singletime' in csvtype%}
+  {% elif csvdata and csvtype%}
     <div class="container-fluid py-1 px-7">
       <a href="{% url 'csvtables' %}" class="nav-link text-body font-weight-bold">
         <i class="fa fa-file-csv me-sm-1"></i>

@@ -57,7 +57,13 @@ def index(request):
             context= {'csvname': csvname} 
             context.update({'csvtype': csvtype} )
             context.update({'csvtime': datetime.utcfromtimestamp(csvtime)} )
-            context.update( {'csvdata':input_ts.to_dict('records')}) 
+            context.update( {'csvdata':input_ts.reset_index().to_dict('records')}) 
+
+            headers=[]
+            for col in input_ts.reset_index().columns:
+                headers.append({'column': col})
+            context.update( {'csvdataheaders':headers}) 
+
         elif not uploaded_file.name.endswith('.csv'):
             messages.warning(request, 'Please use .csv file extension!')
         
@@ -116,6 +122,7 @@ def index(request):
             imagelist = []
             multidf=[]
             multidflist=[]
+            headers=[]
             if(csvtype=='Singletime'):
                 workflow_type='single'
                 input_df = input_ts
@@ -135,6 +142,10 @@ def index(request):
                 cat_ts.to_csv(save_path) 
                 context.update( {'catdownload': name} )
                 context.update( {'csvtype':'Singletime'})
+                for col in input_ts.columns:
+                    headers.append({'column': col})
+                context.update( {'csvdataheaders':headers})
+                context.update( {'csvdata':input_ts.to_dict('records')}) 
             
             elif(csvtype=='Multitime'):
                 workflow_type='multi-signal'
@@ -174,9 +185,13 @@ def index(request):
                 save_path = os.getcwd() +'/media/categorize_output/'+name
                 cat_df.to_csv(save_path) 
                 context.update( {'catdownload': name} )
-           
+                for col in input_ts.reset_index().columns:
+                    headers.append({'column': col})
+                context.update( {'csvdataheaders':headers}) 
+                context.update( {'csvdata':input_ts.reset_index().to_dict('records')}) 
+            
             context.update( {'formdata': json.dumps(formdata)} )
-            context.update( {'csvdata':input_ts.to_dict('records')})
+            
             
         else:
             messages.warning(request, 'Please upload a .csv file first!')
