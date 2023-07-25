@@ -133,8 +133,10 @@ if(formdata !== "") {
   for (var key of Object.keys(formData)) {
     if(key=="fill_datesvalues" || key=="smoothing" || key=="custombin"){
       document.getElementById(key).checked = true;
-      document.getElementById("fillmethoddiv").style.display = '';
-      document.getElementById(formData["fill_method"]).checked = true;
+      if(key=="fill_datesvalues") {
+        document.getElementById("fillmethoddiv").style.display = '';
+        document.getElementById(formData["fill_method"]).checked = true;
+      }
       if(key=="smoothing" ) {
         document.getElementById("smoothingwindowdiv").style.display = '';
         document.getElementById("smoothingwindow").value = formData["smoothingwindow"];

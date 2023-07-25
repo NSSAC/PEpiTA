@@ -229,6 +229,7 @@ def csvtables(request):
 
 def single_ts_workflow(input_df, request, fill_method, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range, title=None):
     global pp_ts
+    pp_ts = pd.DataFrame()
     if 'fill_datesvalues' in methods:
         pp_ts = preprocess.fill_dates(input_df, freq)
         pp_ts = preprocess.fill_values(pp_ts, fill_method)
