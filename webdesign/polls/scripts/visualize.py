@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+import matplotlib
 from matplotlib.ticker import MaxNLocator
 import os
 from datetime import datetime
+matplotlib.use('agg')
 
 plt.style.use('fast')
 plt.rcParams.update({'font.size': 16, 'font.family': 'sans-serif','font.sans-serif':'Verdana'})
