@@ -14,6 +14,8 @@ from .scripts import visualize
 import numpy as np
 import zipfile
 
+from plotly.offline import plot
+import plotly.express as px
 
 file_directory = ''
 input_ts = pd.DataFrame()
@@ -31,6 +33,7 @@ def index(request):
 
     global file_directory, input_ts, pp_ts, csvname, freq, csvtime, context, csvtype
     context={}
+
 
     if request.method == 'POST' and 'uploadbutton' in request.POST:
         uploaded_file = request.FILES['document']
@@ -146,6 +149,11 @@ def index(request):
                     headers.append({'column': col})
                 context.update( {'csvdataheaders':headers})
                 context.update( {'csvdata':input_ts.to_dict('records')}) 
+                
+                fig = px.line(pp_ts, x='date', y="value")
+                graph_plotly = plot(fig, output_type="div")
+                context.update( {'graph_plotly':graph_plotly})
+
             
             elif(csvtype=='Multitime'):
                 workflow_type='multi-signal'
@@ -167,7 +175,6 @@ def index(request):
                     df.to_csv(save_path) 
                     multidflist.append({'name': name})
                     
-
                 cat_df.columns = input_ts.columns
                 name = visualize.multi_signal_plot(cat_df, cat_method)
                 imagelist.insert(0, {'name': name})
@@ -189,9 +196,12 @@ def index(request):
                     headers.append({'column': col})
                 context.update( {'csvdataheaders':headers}) 
                 context.update( {'csvdata':input_ts.reset_index().to_dict('records')}) 
-            
+
+                fig = px.line(input_ts.reset_index(), x='date', y=input_ts.columns.to_list())
+                graph_plotly = plot(fig, output_type="div")
+                context.update( {'graph_plotly':graph_plotly})
+
             context.update( {'formdata': json.dumps(formdata)} )
-            
             
         else:
             messages.warning(request, 'Please upload a .csv file first!')
