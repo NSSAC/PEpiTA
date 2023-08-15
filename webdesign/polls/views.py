@@ -152,7 +152,7 @@ def index(request):
                 
                 fig = px.line(pp_ts, x='date', y="value")
                 graph_plotly = plot(fig, output_type="div")
-                context.update( {'graph_plotly':graph_plotly})
+                # context.update( {'graph_plotly':graph_plotly})
 
             
             elif(csvtype=='Multitime'):
@@ -199,7 +199,7 @@ def index(request):
 
                 fig = px.line(input_ts.reset_index(), x='date', y=input_ts.columns.to_list())
                 graph_plotly = plot(fig, output_type="div")
-                context.update( {'graph_plotly':graph_plotly})
+                # context.update( {'graph_plotly':graph_plotly})
 
             context.update( {'formdata': json.dumps(formdata)} )
             
