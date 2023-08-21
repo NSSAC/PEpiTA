@@ -5,20 +5,21 @@
 Phase-based Epidemic Time series Analyzer.
 
 ### 1. Install required packages
-#### ***Required a python version>=3.8***
->pip install -r requirements.txt
+#### ***Required: Python>=3.11***
+
+```bash
+pip install -r requirements.txt
+```
 *******************************************************************
 ### 2. Running Server on localhost
-Open a terminal on the PEpiTA folder and follow these commands:<br>
-1. > cd webdesign <br>
+Open a terminal in the PEpiTA folder and follow these commands:
+```bash
+cd webdesign
+python manage.py migrate # if running for the first time
+python manage.py runserver
+```
 
-<code> _# If deploying the webApp for the first time, please run the below command as well_<br></code>
-
-<code> 2. python manage.py migrate</code>
-
-3. >python manage.py runserver
-<br>
-After executing all the above commands you will be able to see a message like this<br>
+After executing all the above commands you will be able to see a message like this:
 
 _Django version 4.2, using settings 'webdesign.settings'<br>
 Starting development server at http://127.0.0.1:8000/<br>
