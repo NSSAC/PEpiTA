@@ -1,0 +1,8 @@
+%appinstall webapp
+mv /webdesign lib
+cd lib/webdesign
+python manage.py migrate
+
+%apprun webapp
+cd $SCIF_APPROOT/lib/webdesign &&
+python manage.py runserver "0.0.0.0:8000"
