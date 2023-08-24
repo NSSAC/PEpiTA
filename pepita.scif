@@ -3,6 +3,16 @@ mv /webdesign lib
 cd lib/webdesign
 python manage.py migrate
 
+%appenv webapp
+export DJANGO_PORT="${DJANGO_PORT:-8000}"
+
 %apprun webapp
 cd $SCIF_APPROOT/lib/webdesign &&
-python manage.py runserver "0.0.0.0:8000"
+python manage.py runserver "0.0.0.0:$DJANGO_PORT"
+
+%apprun rivannawebapp
+export SCIF_APPROOT=/scif/apps/webapp
+. $SCIF_APPROOT/scif/environment.sh
+export DJANGO_BASE_PATH="node/$(hostname)/$DJANGO_PORT"
+echo "site should become available at https://rivanna-portal.hpc.virginia.edu/$DJANGO_BASE_PATH"
+. $SCIF_APPROOT/scif/runscript
