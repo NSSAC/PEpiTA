@@ -134,3 +134,6 @@ dmypy.json
 # container artifacts
 *.sif
 blob
+
+# OSX junk
+.DS_Store
