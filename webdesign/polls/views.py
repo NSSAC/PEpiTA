@@ -5,6 +5,7 @@ from django.contrib import messages
 import os
 import pandas as pd
 from os.path import exists
+from pathlib import Path
 import json
 from datetime import datetime
 from .scripts import preprocess
@@ -17,7 +18,7 @@ import zipfile
 from plotly.offline import plot
 import plotly.express as px
 
-file_directory = ''
+file_path = ''
 input_ts = pd.DataFrame()
 pp_ts = pd.DataFrame()
 csvname=''
@@ -26,12 +27,26 @@ csvtime=''
 context={}
 csvtype='Singletime'
 
+media_path = Path(__file__).resolve().parent.parent / "media"
+# make sure output paths are created
+fig_path = media_path / "figures"
+fig_path.mkdir(exist_ok=True, parents=True)
+
+analytical_summary_path = media_path / "analytical_summary"
+analytical_summary_path.mkdir(exist_ok=True, parents=True)
+
+categorize_output_path = media_path / "categorize_output"
+categorize_output_path.mkdir(exist_ok=True, parents=True)
+
+zip_path = media_path / "zip"
+zip_path.mkdir(exist_ok=True, parents=True)
+
 def index(request):
     cat_ts = pd.Series
     trend_ts = pd.Series
     bin_bounds = np.ndarray
 
-    global file_directory, input_ts, pp_ts, csvname, freq, csvtime, context, csvtype
+    global file_path, input_ts, pp_ts, csvname, freq, csvtime, context, csvtype, media_path, analytical_summary_path, categorize_output_path, zip_path
     context={}
 
 
@@ -41,12 +56,11 @@ def index(request):
         if uploaded_file.name.endswith('.csv'):
             savefile = FileSystemStorage()
             csvname = savefile.save(uploaded_file.name, uploaded_file)
-            d = os.getcwd() 
-            file_directory = d+'/media/'+csvname 
+            file_path = str(media_path / csvname)
             messages.info(request, 'File upload Success!')
             loc = csvname.rfind("_")
             csvname = csvname[0:len(csvname)-12]+'.csv'
-            csvtime= os. path. getmtime(file_directory)
+            csvtime = os.path.getmtime(file_path)
             if 'W' in request.POST.getlist('csvfrequency'):
                 freq='W'
             else:
@@ -56,7 +70,7 @@ def index(request):
             else:
                 csvtype='Singletime'
             
-            readfile(file_directory)
+            readfile(file_path)
             context= {'csvname': csvname} 
             context.update({'csvtype': csvtype} )
             context.update({'csvtime': datetime.utcfromtimestamp(csvtime)} )
@@ -77,11 +91,11 @@ def index(request):
             messages.warning(request, 'Upload failed. Please try again!')
     
     if request.method == 'POST' and 'runbutton' in request.POST:
-        if exists(file_directory):
+        if exists(file_path):
             formdata = {}
             # formdata['csvfrequency'] = freq
 
-            csvtime= os.path.getmtime(file_directory)
+            csvtime= os.path.getmtime(file_path)
             methods=request.POST.getlist('datapreprocess')
             smoothing_window = request.POST.get('smoothingwindow')
             cat_method=request.POST.getlist('categorizetype')
@@ -135,13 +149,13 @@ def index(request):
                 context.update({'qdata': json.loads(df.reset_index().to_json(orient='records'))})
                 timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
                 name=timestr+'_analyticalsummary.csv' 
-                save_path = os.getcwd() +'/media/analytical_summary/'+name
+                save_path = str(analytical_summary_path / name)
                 df.to_csv(save_path) 
                 context.update( {'analyticalsummary': name} )
 
                 timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
                 name=timestr+'_catdownload.csv' 
-                save_path = os.getcwd() +'/media/categorize_output/'+name
+                save_path = str(categorize_output_path / name)
                 cat_ts.to_csv(save_path) 
                 context.update( {'catdownload': name} )
                 context.update( {'csvtype':'Singletime'})
@@ -170,8 +184,8 @@ def index(request):
                     multidf.append({'eachdf':json.loads(df.reset_index().to_json(orient='records')),'name':column})
                     
                     timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
-                    name=timestr+'_analyticalsummary_'+column+'.csv' 
-                    save_path = os.getcwd() +'/media/analytical_summary/'+name
+                    name=timestr+'_analyticalsummary_'+column+'.csv'
+                    save_path = str(analytical_summary_path / name)
                     df.to_csv(save_path) 
                     multidflist.append({'name': name})
                     
@@ -189,7 +203,7 @@ def index(request):
                 context.update({'imagelist':imagelist})
                 timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
                 name=timestr+'_catdownload.csv' 
-                save_path = os.getcwd() +'/media/categorize_output/'+name
+                save_path = str(categorize_output_path / name)
                 cat_df.to_csv(save_path) 
                 context.update( {'catdownload': name} )
                 for col in input_ts.reset_index().columns:
@@ -279,7 +293,7 @@ def single_ts_workflow(input_df, request, fill_method, formdata, methods, freq, 
     
 def zipfiles(filenames, tag, path):
     name=datetime.utcnow().strftime('%Y%m%d%H%M%S%f')+'_'+tag+'.zip'
-    spath=os.getcwd() +'/media/zip/'+name
+    spath=str(zip_path / name)
 
     with zipfile.ZipFile(spath, 'w') as z:
         for i in filenames:
