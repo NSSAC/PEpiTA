@@ -1,0 +1,20 @@
+[
+    {
+        "base_url": "healthdata.gov",
+        "socrata_id": "g62h-syeh",
+        "suffix": ".json",
+        "query": {
+            "$select": [
+                "date",
+                "hospital_onset_covid"
+            ]
+        }
+    },
+    {
+        "name": "",
+        "description": "",
+        "base_url": "",
+        "url_path": "",
+        "filename": ""
+    }
+]
