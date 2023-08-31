@@ -5,7 +5,7 @@ def cat_counts(cat_ts):
     return cat_ts.value_counts()
 
 def single_ts_analyze(cat_ts,bin_bounds,freq):
-    summ_df = cat_ts.value_counts().sort_index().reset_index().rename({'index':'category','value':'number_of_occurrences'},axis=1)
+    summ_df = cat_ts.value_counts().sort_index().reset_index().rename({'value':'category','count':'number_of_occurrences'},axis=1)
     summ_df['percent_time_spent'] = summ_df['number_of_occurrences'].apply(lambda x: str(np.round(x/len(cat_ts)*100,2))+'%')
     summ_df['bin_boundaries'] = summ_df['category'].apply(lambda x: str((np.round(bin_bounds[int(x[1:])-1],2),
                                                              np.round(bin_bounds[int(x[1:])],2))))
