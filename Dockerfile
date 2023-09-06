@@ -5,12 +5,16 @@ FROM python:3.11
 # 		postgresql-client \
 # 	&& rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/src/app
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
-COPY . .
-WORKDIR webdesign
-RUN python manage.py migrate
+COPY requirements.txt pepita.scif /
+COPY webdesign /webdesign
+RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install ipython scif
+RUN scif install /pepita.scif
+
+# RUN python manage.py migrate
 
 EXPOSE 8000
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+ENTRYPOINT ["scif"]
+
+CMD ["run", "webapp"]

@@ -29,3 +29,5 @@ Now open a browser and go to http://localhost:8000/ or http://127.0.0.1:8000/
 *******************************************************************
 ### 3.  Headless Implementation
 workflow_notebook.ipynb shows the implementation of all the python scripts in a Jupyter Notebook.
+
+### You can also try [running with Docker](docker.md).

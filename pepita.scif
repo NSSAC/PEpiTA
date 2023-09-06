@@ -1,7 +1,7 @@
 %appinstall webapp
 mv /webdesign lib
 cd lib/webdesign
-python manage.py migrate
+# python manage.py migrate
 
 %appenv webapp
 export DJANGO_PORT="${DJANGO_PORT:-8000}"
