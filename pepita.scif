@@ -1,6 +1,6 @@
 %appinstall webapp
 mv /webdesign lib
-cd lib/webdesign
+# cd lib/webdesign
 # python manage.py migrate
 
 %appenv webapp

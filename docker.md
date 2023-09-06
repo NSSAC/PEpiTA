@@ -11,9 +11,9 @@ cd PEpiTA
 docker build --tag pepita:001 .
 ```
 
-Create a container and run with the default "[CMD]" using the default "[ENTRYPOINT],
+Create a container and run with the default "CMD" using the default "ENTRYPOINT",
 exposing your host machine('s browser) to the contained web server's port."
-(see the [Dockerfile](Dockerfile)).
+(see the [Dockerfile](Dockerfile), which uses [this scif recipe](pepita.scif)).
 
 ```bash
 docker run --interactive --tty --publish 8000:8000  pepita:001
