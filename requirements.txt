@@ -14,6 +14,8 @@ django==4.2.4
     # via -r requirements.in
 fonttools==4.42.1
     # via matplotlib
+gunicorn==21.2.0
+    # via -r requirements.in
 json5==0.9.14
     # via -r requirements.in
 kiwisolver==1.4.5
@@ -27,6 +29,7 @@ numpy==1.25.2
     #   pandas
 packaging==23.1
     # via
+    #   gunicorn
     #   matplotlib
     #   plotly
 pandas==2.0.3
