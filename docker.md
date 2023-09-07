@@ -1,5 +1,5 @@
 ## Pull and Run Our Docker Image
-**coming soon . . .**
+Follow instructions on the [pepita container package page](https://github.com/NSSAC/PEpiTA/pkgs/container/pepita).
 
 ## Build and Run a Local Docker Image (based on the latest code)
 
