@@ -8,7 +8,8 @@ export DJANGO_PORT="${DJANGO_PORT:-8000}"
 
 %apprun webapp
 cd $SCIF_APPROOT/lib/webdesign &&
-python manage.py runserver "0.0.0.0:$DJANGO_PORT"
+gunicorn --bind ":$DJANGO_PORT" webdesign.wsgi
+# python manage.py runserver "0.0.0.0:$DJANGO_PORT"
 
 %apprun rivannawebapp
 export SCIF_APPROOT=/scif/apps/webapp
