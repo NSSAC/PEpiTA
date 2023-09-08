@@ -71,13 +71,14 @@ def index(request):
             
             csvtime=datetime.utcnow()
             csvname='API URL'
+            datamindate=input_ts.index.min()
+            datamaxdate=input_ts.index.max()
             context= {'csvname': csvname} 
             context.update({'csvtype': csvtype} )
             context.update({'csvtime': csvtime} )
             context.update( {'csvdata':input_ts.reset_index().to_dict('records')}) 
-            context.update({'datamindate': input_ts.index.min()} )
-            context.update({'datamaxdate': input_ts.index.max()} )
-
+            context.update({'datamindate': datamindate} )
+            context.update({'datamaxdate': datamaxdate} )
             headers=[]
             for col in input_ts.reset_index().columns:
                 headers.append({'column': col})
@@ -110,9 +111,15 @@ def index(request):
             context.update({'csvtype': csvtype} )
             context.update({'csvtime': csvtime} )
             context.update( {'csvdata':input_ts.reset_index().to_dict('records')}) 
-            context.update({'datamindate': input_ts.index.min()} )
-            context.update({'datamaxdate': input_ts.index.max()} )
+            if 'Multitime' in csvtype:
+                datamindate=input_ts.index.min()
+                datamaxdate=input_ts.index.max()
+            elif 'Singletime' in csvtype:
+                datamindate=input_ts['date'].min()
+                datamaxdate=input_ts['date'].max()
 
+            context.update({'datamindate': datamindate} )
+            context.update({'datamaxdate': datamaxdate} )
             headers=[]
             for col in input_ts.reset_index().columns:
                 headers.append({'column': col})
@@ -131,13 +138,17 @@ def index(request):
         if not input_ts.empty:
             formdata = {}
             # formdata['csvfrequency'] = freq
-
             methods=request.POST.getlist('datapreprocess')
             smoothing_window = request.POST.get('smoothingwindow')
             cat_method=request.POST.getlist('categorizetype')
             num_bins = request.POST.get('binsize')
             win_size = request.POST.get('trendsize')
             fill_method=request.POST.getlist('fillmethod')
+            datamindate=request.POST.getlist('min_date')
+            datamaxdate=request.POST.getlist('max_date')
+
+            datamindate = datetime.strptime(datamindate[0], '%Y-%m-%d')
+            datamaxdate = datetime.strptime(datamaxdate[0], '%Y-%m-%d')
 
             if(not smoothing_window):
                 smoothing_window = 7
@@ -178,6 +189,7 @@ def index(request):
             headers=[]
             if(csvtype=='Singletime'):
                 workflow_type='single'
+                input_ts = input_ts.loc[(input_ts['date'] >= datamindate ) & (input_ts['date'] <= datamaxdate)]
                 input_df = input_ts
                 name, cat_ts, df ,formdata = single_ts_workflow(input_df,request, fill_method, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range)
                 
@@ -208,6 +220,11 @@ def index(request):
             elif(csvtype=='Multitime'):
                 workflow_type='multi-signal'
                 cat_df = pd.DataFrame()
+                if input_ts[datamindate:datamaxdate].empty:
+                    input_ts=input_ts[datamaxdate:datamindate]
+                else:
+                    input_ts=input_ts[datamindate:datamaxdate]
+           
                 for column in input_ts.columns:
                     signal_ts = input_ts[[column]]
                     signal_ts.columns = ['value']
@@ -250,7 +267,9 @@ def index(request):
                 fig = px.line(input_ts.reset_index(), x='date', y=input_ts.columns.to_list())
                 graph_plotly = plot(fig, output_type="div")
                 # context.update( {'graph_plotly':graph_plotly})
-
+                
+            context.update({'datamindate': datamindate} )
+            context.update({'datamaxdate': datamaxdate} )
             context.update( {'formdata': json.dumps(formdata)} )
             
         else:

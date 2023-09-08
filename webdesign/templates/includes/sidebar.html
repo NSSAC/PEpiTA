@@ -108,11 +108,11 @@
           <label>Date Filter:</label>
           <ul>
             <li style="list-style-type: none;"> <label for="min_date">Min Date:</label>
-              <input type="date" id="min_date" name="min_date" value="" style="font-size:13px;width:57%;height:20px">
+              <input type="date" id="min_date" name="min_date" value="{{datamindate|date:'Y-m-d'}}" style="font-size:13.5px;width:55%;height:20px">
             </li>
             <li style="list-style-type: none;">
               <label for="max_date">Max Date:</label>
-              <input type="date" id="max_date" name="max_date" value="" style="font-size:13px;width:57%;height:20px">
+              <input type="date" id="max_date" name="max_date" value="{{datamaxdate|date:'Y-m-d'}}" style="font-size:13.5px;width:55%;height:20px">
               
             </li>
           </ul>
