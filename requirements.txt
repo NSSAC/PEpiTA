@@ -54,3 +54,5 @@ tenacity==8.2.3
     # via plotly
 tzdata==2023.3
     # via pandas
+whitenoise==6.5.0
+    # via -r requirements.in
