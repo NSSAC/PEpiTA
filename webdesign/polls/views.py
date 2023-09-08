@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
+from django.forms import URLField
+from django.core.exceptions import ValidationError
+
 import os
 import pandas as pd
 from os.path import exists
@@ -26,6 +29,8 @@ freq='D'
 csvtime=''
 context={}
 csvtype='Singletime'
+datamindate=''
+datamaxdate=''
 
 media_path = Path(__file__).resolve().parent.parent / "media"
 # make sure output paths are created
@@ -41,14 +46,44 @@ categorize_output_path.mkdir(exist_ok=True, parents=True)
 zip_path = media_path / "zip"
 zip_path.mkdir(exist_ok=True, parents=True)
 
+
 def index(request):
     cat_ts = pd.Series
     trend_ts = pd.Series
     bin_bounds = np.ndarray
 
-    global file_path, input_ts, pp_ts, csvname, freq, csvtime, context, csvtype, media_path, analytical_summary_path, categorize_output_path, zip_path
+    global file_path, input_ts, pp_ts, csvname, freq, csvtime, context, csvtype, media_path, analytical_summary_path, categorize_output_path, zip_path, datamindate, datamaxdate
     context={}
 
+    if request.method == 'POST' and 'uploadapibutton' in request.POST:
+        dataurl = request.POST.get('apiurltext')
+        if validate_url(dataurl):
+            if 'W' in request.POST.getlist('csvfrequency'):
+                freq='W'
+            else:
+                freq='D'
+            if 'Multitime' in request.POST.getlist('uploadtype'):
+                csvtype='Multitime'
+            else:
+                csvtype='Singletime'
+
+            readapi(dataurl)
+            
+            csvtime=datetime.utcnow()
+            csvname='API URL'
+            context= {'csvname': csvname} 
+            context.update({'csvtype': csvtype} )
+            context.update({'csvtime': csvtime} )
+            context.update( {'csvdata':input_ts.reset_index().to_dict('records')}) 
+            context.update({'datamindate': input_ts.index.min()} )
+            context.update({'datamaxdate': input_ts.index.max()} )
+
+            headers=[]
+            for col in input_ts.reset_index().columns:
+                headers.append({'column': col})
+            context.update( {'csvdataheaders':headers}) 
+        else:
+            messages.warning(request, 'Please enter a valid url')
 
     if request.method == 'POST' and 'uploadbutton' in request.POST:
         uploaded_file = request.FILES['document']
@@ -60,7 +95,7 @@ def index(request):
             messages.info(request, 'File upload Success!')
             loc = csvname.rfind("_")
             csvname = csvname[0:len(csvname)-12]+'.csv'
-            csvtime = os.path.getmtime(file_path)
+            csvtime = datetime.utcfromtimestamp(os.path.getmtime(file_path))
             if 'W' in request.POST.getlist('csvfrequency'):
                 freq='W'
             else:
@@ -73,8 +108,10 @@ def index(request):
             readfile(file_path)
             context= {'csvname': csvname} 
             context.update({'csvtype': csvtype} )
-            context.update({'csvtime': datetime.utcfromtimestamp(csvtime)} )
+            context.update({'csvtime': csvtime} )
             context.update( {'csvdata':input_ts.reset_index().to_dict('records')}) 
+            context.update({'datamindate': input_ts.index.min()} )
+            context.update({'datamaxdate': input_ts.index.max()} )
 
             headers=[]
             for col in input_ts.reset_index().columns:
@@ -91,11 +128,10 @@ def index(request):
             messages.warning(request, 'Upload failed. Please try again!')
     
     if request.method == 'POST' and 'runbutton' in request.POST:
-        if exists(file_path):
+        if not input_ts.empty:
             formdata = {}
             # formdata['csvfrequency'] = freq
 
-            csvtime= os.path.getmtime(file_path)
             methods=request.POST.getlist('datapreprocess')
             smoothing_window = request.POST.get('smoothingwindow')
             cat_method=request.POST.getlist('categorizetype')
@@ -131,7 +167,7 @@ def index(request):
             
 
             context= {'csvname': csvname} 
-            context.update({'csvtime': datetime.utcfromtimestamp(csvtime)} )
+            context.update({'csvtime': csvtime} )
             
             formdata['smoothingwindow'] = smoothing_window
             formdata['binsize'] = num_bins  
@@ -218,10 +254,35 @@ def index(request):
             context.update( {'formdata': json.dumps(formdata)} )
             
         else:
-            messages.warning(request, 'Please upload a .csv file first!')
+            messages.warning(request, 'No data in the memory')
     context.update( {'currentpath':'index'})
     return render(request, 'pages/index.html',context)
 
+def readapi(dataurl):
+    global input_ts
+    dateflag=False
+    mainurl=dataurl[0:dataurl.index('.json')+5]
+    suffix="?$select=count(*)"
+    maxlimit=pd.read_json(mainurl+suffix)['count'][0]
+    
+    if('$query' in dataurl):
+        suffix="%20LIMIT%20"+str(maxlimit)
+    else:
+        suffix="?$limit="+str(maxlimit)+"&$offset=0"
+    dataurl=dataurl+suffix
+    
+    results_df = pd.read_json(dataurl)
+    for col in results_df.columns:
+        if "date" in col.lower() and not dateflag:
+            results_df[col] = pd.to_datetime(results_df[col])
+            results_df = results_df.rename(columns={col: 'date'})
+            dateflag=True
+        elif not results_df[col].dtype==np.int64 or  not results_df[col].dtype==np.float64 and not dateflag:
+            results_df = results_df.drop(col, axis=1) 
+            
+    results_df=results_df.drop_duplicates(subset=['date'])
+    results_df=results_df.set_index('date')
+    input_ts = results_df
 
 def readfile(filename):
     global input_ts
@@ -301,3 +362,11 @@ def zipfiles(filenames, tag, path):
             z.write(fpath)
     z.close()
     return name
+
+def validate_url(url):
+    url_form_field = URLField()
+    try:
+        url = url_form_field.clean(url)
+    except ValidationError:
+        return False
+    return True

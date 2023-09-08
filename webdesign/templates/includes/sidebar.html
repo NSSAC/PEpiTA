@@ -59,16 +59,29 @@
                 </li>
               </ul>
             </ul>
+            <div style="background-color: #ededed;  border: 0.5px solid gray;">
             <label class="text-black up bold mb-0 p-0 w-100">Upload csv file:</label>
-            <div class="row content">
-              <div class="col">
+            <ul>
+              <li style="list-style-type: none;margin-left: -30px;">
                 <input type="file" class="btn btn-sm shadow-sm bg-white p-0 m-50" name="document"
-                  style="max-width:200px" id="document" required="required">
-              </div>
-              <div class="col">
+                  style="max-width:195px" id="document" >
+              </li>
+              <li style="list-style-type: none;">
                 <button id="submit" name="uploadbutton" class="shadow-sm bg-white rounded  ">Click to upload</a>
-              </div>
-            </div>
+              </li>
+            </ul>
+            <div style="background-color:gray;height:1px;max-width:200px"></div>
+            <label class="text-black up bold mb-0 p-0 w-100">Or API URL:</label>
+            <ul>
+              <li style="list-style-type: none;margin-left: -30px;">
+                <input type="text" id="apiurltext" name="apiurltext" style="height:28px;width:98%">
+              </li>
+              <li style="list-style-type: none;">
+                <button id="submit" name="uploadapibutton" style="margin-top: 15px;" class="shadow-sm bg-white rounded  ">Get Data</a>
+              </li>
+            </ul>
+          </div>
+
           </form>
         </div>
       </div>
@@ -76,7 +89,7 @@
     {% if csvname %}
     <div>
       <code>File in memory: {{csvname}}</code>
-      <code>Last Updated: {{csvtime}}</code>
+      <code>Last Updated(UTC): {{csvtime}}</code>
     </div>
     {% elif messages %}
     <div class="container" style="color: firebrick; margin-top: 20px">
@@ -91,6 +104,19 @@
     <form action="" method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="card bg-light" id="sidenavCard2">
+        <div class="card-body text-start p-0 w-100">
+          <label>Date Filter:</label>
+          <ul>
+            <li style="list-style-type: none;"> <label for="min_date">Min Date:</label>
+              <input type="date" id="min_date" name="min_date" value="" style="font-size:13px;width:57%;height:20px">
+            </li>
+            <li style="list-style-type: none;">
+              <label for="max_date">Max Date:</label>
+              <input type="date" id="max_date" name="max_date" value="" style="font-size:13px;width:57%;height:20px">
+              
+            </li>
+          </ul>
+        </div>
         <div class="card-body text-start p-0 w-100">
           <label>Data Preprocess methods:</label>
           <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
