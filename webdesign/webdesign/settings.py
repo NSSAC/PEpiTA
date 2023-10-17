@@ -57,6 +57,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+
 ROOT_URLCONF = "webdesign.urls"
 
 HOME_TEMPLATES = os.path.join(BASE_DIR, 'templates')
