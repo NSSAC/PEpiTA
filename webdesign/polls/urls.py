@@ -5,5 +5,5 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-     path('csvtables/', views.csvtables, name='csvtables'),
+    path('csvtables/', views.csvtables, name='csvtables'),
 ]

@@ -31,14 +31,14 @@
               </span>
             </div>
             <ul>
-              <li style="list-style-type: none;"><input type="radio" id="singletime" name="uploadtype"
-                  value="Singletime" onclick="displaySelect()" required>
+              <!-- <li style="list-style-type: none;"><input type="radio" id="singletime" name="uploadtype"
+                  value="Singletime" onclick="displaySelect()" >
                 <label>Single-time series </label>
               </li>
               <li style="list-style-type: none;"><input type="radio" id="multitime" name="uploadtype" value="Multitime"
                   onclick="displaySelect()">
                 <label>Multi-time series </label><br>
-                <!-- <ul>
+                <ul>
                     <li style="list-style-type: none;">
                       <div style="display:none" id="multiseriestypetextdiv">
                         <input type="radio" name="multiseriestype" id="multiseriestyperegions" value="multiseriestyperegions" >
@@ -47,8 +47,8 @@
                         <label >Signals</label>
                       </div>
                     </li>
-                  </ul> -->
-              </li>
+                  </ul>
+              </li> -->
               <label>Frequency</label><br>
               <ul>
                 <li style="list-style-type: none;">
@@ -60,27 +60,28 @@
               </ul>
             </ul>
             <div style="background-color: #ededed;  border: 0.5px solid gray;">
-            <label class="text-black up bold mb-0 p-0 w-100">Upload csv file:</label>
-            <ul>
-              <li style="list-style-type: none;margin-left: -30px;">
-                <input type="file" class="btn btn-sm shadow-sm bg-white p-0 m-50" name="document"
-                  style="max-width:195px" id="document" >
-              </li>
-              <li style="list-style-type: none;">
-                <button id="submit" name="uploadbutton" class="shadow-sm bg-white rounded  ">Click to upload</a>
-              </li>
-            </ul>
-            <div style="background-color:gray;height:1px;max-width:200px"></div>
-            <label class="text-black up bold mb-0 p-0 w-100">Or API URL:</label>
-            <ul>
-              <li style="list-style-type: none;margin-left: -30px;">
-                <input type="text" id="apiurltext" name="apiurltext" style="height:28px;width:98%">
-              </li>
-              <li style="list-style-type: none;">
-                <button id="submit" name="uploadapibutton" style="margin-top: 15px;" class="shadow-sm bg-white rounded  ">Get Data</a>
-              </li>
-            </ul>
-          </div>
+              <label class="text-black up bold mb-0 p-0 w-100">Upload csv file:</label>
+              <ul>
+                <li style="list-style-type: none;margin-left: -30px;">
+                  <input type="file" class="btn btn-sm shadow-sm bg-white p-0 m-50" name="document"
+                    style="max-width:195px" id="document">
+                </li>
+                <li style="list-style-type: none;">
+                  <button id="submit" name="uploadbutton" class="shadow-sm bg-white rounded  ">Click to upload</button>
+                </li>
+              </ul>
+              <div style="background-color:gray;height:1px;max-width:300px"></div>
+              <label class="text-black up bold mb-0 p-0 w-100">Or API URL:</label>
+              <ul>
+                <li style="list-style-type: none;margin-left: -30px;">
+                  <input type="text" id="apiurltext" name="apiurltext" style="height:28px;width:98%">
+                </li>
+                <li style="list-style-type: none;">
+                  <button id="submit" name="uploadapibutton" style="margin-top: 15px;"
+                    class="shadow-sm bg-white rounded  ">Get Data</button>
+                </li>
+              </ul>
+            </div>
 
           </form>
         </div>
@@ -100,20 +101,21 @@
     {% else %}
     &nbsp;
     {% endif %}
-
-    <form action="" method="POST" enctype="multipart/form-data">
+    <div class="docs-info">
+    <form method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="card bg-light" id="sidenavCard2">
         <div class="card-body text-start p-0 w-100">
           <label>Date Filter:</label>
           <ul>
             <li style="list-style-type: none;"> <label for="min_date">Min Date:</label>
-              <input type="date" id="min_date" name="min_date" value="{{datamindate|date:'Y-m-d'}}" style="font-size:13.5px;width:55%;height:20px">
+              <input type="date" id="min_date" name="min_date" value="{{datacurmindate|date:'Y-m-d'}}"
+                min="{{datamindate|date:'Y-m-d'}}" style="font-size:13.5px;width:55%;height:20px" required>
             </li>
             <li style="list-style-type: none;">
               <label for="max_date">Max Date:</label>
-              <input type="date" id="max_date" name="max_date" value="{{datamaxdate|date:'Y-m-d'}}" style="font-size:13.5px;width:55%;height:20px">
-              
+              <input type="date" id="max_date" name="max_date" value="{{datacurmaxdate|date:'Y-m-d'}}"
+                max="{{datamaxdate|date:'Y-m-d'}}" style="font-size:13.5px;width:55%;height:20px" required>
             </li>
           </ul>
         </div>
@@ -121,14 +123,15 @@
           <label>Data Preprocess methods:</label>
           <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
             <span class="tooltip-text" style="top: -100px;right: 100%;" id="right">
-              “Fill dates” reindexes the time series based on frequency spanning the start and end dates;<br><br> "Fill values" uses linear interpolation or forward fill to replace missing values.
+              “Fill dates” reindexes the time series based on frequency spanning the start and end dates;<br><br> "Fill
+              values" uses linear interpolation or forward fill to replace missing values.
               <br><br>"Smoothing" performs a rolling average over a specified window.
             </span>
           </div>
           <ul>
             <li style="list-style-type: none;"><input type="checkbox" id="fill_datesvalues" name="datapreprocess"
                 value="fill_datesvalues" onclick="displaySelect()">
-              <label for="fill_dates"> Fill Dates/Values</label>
+              <label for="fill_datesvalues"> Fill Dates/Values</label>
             </li>
             <div id="fillmethoddiv" style="float: left;display:none">
               <label>Method</label><br>
@@ -156,9 +159,7 @@
                   </span>
                 </li>
               </ul>
-
             </div>
-
           </ul>
         </div>
       </div>
@@ -235,12 +236,11 @@
               </span>
             </div>
           </ul>
-          <div class="col">
-            <button id="submitmethod" name="runbutton" class="shadow-sm bg-white rounded  ">Run</a>
-          </div>
         </div>
       </div>
+      <button id="submit" name="runbutton" style="cursor: auto;margin: 15px 0;" class="shadow-sm bg-white rounded ">Run</button>
     </form>
+  </div>
 
     {% block messages %}
     {% if messages %}

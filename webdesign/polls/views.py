@@ -28,9 +28,11 @@ csvname=''
 freq='D'
 csvtime=''
 context={}
-csvtype='Singletime'
+csvtype=''
 datamindate=''
+datacurmindate=''
 datamaxdate=''
+datacurmaxdate=''
 
 media_path = Path(__file__).resolve().parent.parent / "media"
 # make sure output paths are created
@@ -52,9 +54,8 @@ def index(request):
     trend_ts = pd.Series
     bin_bounds = np.ndarray
 
-    global file_path, input_ts, pp_ts, csvname, freq, csvtime, context, csvtype, media_path, analytical_summary_path, categorize_output_path, zip_path, datamindate, datamaxdate
+    global file_path, input_ts, pp_ts, csvname, freq, csvtime, context, csvtype, media_path, analytical_summary_path, categorize_output_path, zip_path, datamindate, datamaxdate, datacurmindate, datacurmaxdate
     context={}
-
     if request.method == 'POST' and 'uploadapibutton' in request.POST:
         dataurl = request.POST.get('apiurltext')
         if validate_url(dataurl):
@@ -62,10 +63,10 @@ def index(request):
                 freq='W'
             else:
                 freq='D'
-            if 'Multitime' in request.POST.getlist('uploadtype'):
-                csvtype='Multitime'
-            else:
-                csvtype='Singletime'
+            # if 'Multitime' in request.POST.getlist('uploadtype'):
+            #     csvtype='Multitime'
+            # else:
+            #     csvtype='Singletime'
 
             readapi(dataurl)
             
@@ -73,12 +74,16 @@ def index(request):
             csvname='API URL'
             datamindate=input_ts.index.min()
             datamaxdate=input_ts.index.max()
+            datacurmindate=datamindate
+            datacurmaxdate=datamaxdate
             context= {'csvname': csvname} 
             context.update({'csvtype': csvtype} )
             context.update({'csvtime': csvtime} )
             context.update( {'csvdata':input_ts.reset_index().to_dict('records')}) 
             context.update({'datamindate': datamindate} )
             context.update({'datamaxdate': datamaxdate} )
+            context.update({'datacurmindate': datacurmindate} )
+            context.update({'datacurmaxdate': datacurmaxdate} )
             headers=[]
             for col in input_ts.reset_index().columns:
                 headers.append({'column': col})
@@ -101,10 +106,10 @@ def index(request):
                 freq='W'
             else:
                 freq='D'
-            if 'Multitime' in request.POST.getlist('uploadtype'):
-                csvtype='Multitime'
-            else:
-                csvtype='Singletime'
+            # if 'Multitime' in request.POST.getlist('uploadtype'):
+            #     csvtype='Multitime'
+            # else:
+            #     csvtype='Singletime'
             
             readfile(file_path)
             context= {'csvname': csvname} 
@@ -117,9 +122,12 @@ def index(request):
             elif 'Singletime' in csvtype:
                 datamindate=input_ts['date'].min()
                 datamaxdate=input_ts['date'].max()
-
+            datacurmindate=datamindate
+            datacurmaxdate=datamaxdate
             context.update({'datamindate': datamindate} )
             context.update({'datamaxdate': datamaxdate} )
+            context.update({'datacurmindate': datacurmindate} )
+            context.update({'datacurmaxdate': datacurmaxdate} )
             headers=[]
             for col in input_ts.reset_index().columns:
                 headers.append({'column': col})
@@ -144,11 +152,11 @@ def index(request):
             num_bins = request.POST.get('binsize')
             win_size = request.POST.get('trendsize')
             fill_method=request.POST.getlist('fillmethod')
-            datamindate=request.POST.getlist('min_date')
-            datamaxdate=request.POST.getlist('max_date')
+            datacurmindate=request.POST.getlist('min_date')
+            datacurmaxdate=request.POST.getlist('max_date')
 
-            datamindate = datetime.strptime(datamindate[0], '%Y-%m-%d')
-            datamaxdate = datetime.strptime(datamaxdate[0], '%Y-%m-%d')
+            datacurmindate = datetime.strptime(datacurmindate[0], '%Y-%m-%d')
+            datacurmaxdate = datetime.strptime(datacurmaxdate[0], '%Y-%m-%d')
 
             if(not smoothing_window):
                 smoothing_window = 7
@@ -189,8 +197,7 @@ def index(request):
             headers=[]
             if(csvtype=='Singletime'):
                 workflow_type='single'
-                input_ts = input_ts.loc[(input_ts['date'] >= datamindate ) & (input_ts['date'] <= datamaxdate)]
-                input_df = input_ts
+                input_df = input_ts.loc[(input_ts['date'] >= datacurmindate ) & (input_ts['date'] <= datacurmaxdate)]
                 name, cat_ts, df ,formdata = single_ts_workflow(input_df,request, fill_method, formdata, methods, freq, cat_method, workflow_type, smoothing_window, win_size, num_bins, custom_range)
                 
                 context.update({'graphfile': name})
@@ -220,13 +227,14 @@ def index(request):
             elif(csvtype=='Multitime'):
                 workflow_type='multi-signal'
                 cat_df = pd.DataFrame()
-                if input_ts[datamindate:datamaxdate].empty:
-                    input_ts=input_ts[datamaxdate:datamindate]
+                input_tstmp=pd.DataFrame()
+                if input_ts[datacurmindate:datacurmaxdate].empty:
+                    input_tstmp=input_ts[datacurmaxdate:datacurmindate]
                 else:
-                    input_ts=input_ts[datamindate:datamaxdate]
+                    input_tstmp=input_ts[datacurmindate:datacurmaxdate]
            
-                for column in input_ts.columns:
-                    signal_ts = input_ts[[column]]
+                for column in input_tstmp.columns:
+                    signal_ts = input_tstmp[[column]]
                     signal_ts.columns = ['value']
 
                     input_df = signal_ts.reset_index()
@@ -270,6 +278,8 @@ def index(request):
                 
             context.update({'datamindate': datamindate} )
             context.update({'datamaxdate': datamaxdate} )
+            context.update({'datacurmindate': datacurmindate} )
+            context.update({'datacurmaxdate': datacurmaxdate} )
             context.update( {'formdata': json.dumps(formdata)} )
             
         else:
@@ -278,7 +288,8 @@ def index(request):
     return render(request, 'pages/index.html',context)
 
 def readapi(dataurl):
-    global input_ts
+    global input_ts, csvtype
+    csvtype='Multitime'
     dateflag=False
     mainurl=dataurl[0:dataurl.index('.json')+5]
     suffix="?$select=count(*)"
@@ -291,6 +302,7 @@ def readapi(dataurl):
     dataurl=dataurl+suffix
     
     results_df = pd.read_json(dataurl)
+    results_df=results_df.dropna() 
     for col in results_df.columns:
         if "date" in col.lower() and not dateflag:
             results_df[col] = pd.to_datetime(results_df[col])
@@ -302,9 +314,16 @@ def readapi(dataurl):
     results_df=results_df.drop_duplicates(subset=['date'])
     results_df=results_df.set_index('date')
     input_ts = results_df
+    print(input_ts.columns.tolist())
 
 def readfile(filename):
-    global input_ts
+    global input_ts, csvtype
+    csvFile = pd.read_csv(filename)
+    if(len(csvFile.columns.tolist())==2 and 'date' in csvFile.columns.tolist() and 'value' in csvFile.columns.tolist()):
+        csvtype='Singletime'
+    else:
+        csvtype='Multitime'
+
     if(csvtype=='Singletime'):
         input_ts = pd.read_csv(filename,parse_dates=['date'])
     elif(csvtype=='Multitime'):
@@ -312,7 +331,6 @@ def readfile(filename):
     
 
 def csvtables(request):
-    global context
     context.update( {'currentpath':'csvtables'})
     if request.method == 'POST':
         index(request)
@@ -389,3 +407,4 @@ def validate_url(url):
     except ValidationError:
         return False
     return True
+    
