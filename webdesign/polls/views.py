@@ -100,7 +100,7 @@ def index(request):
             file_path = str(media_path / csvname)
             messages.info(request, 'File upload Success!')
             loc = csvname.rfind("_")
-            csvname = csvname[0:len(csvname)-12]+'.csv'
+            csvname = uploaded_file.name
             csvtime = datetime.utcfromtimestamp(os.path.getmtime(file_path))
             if 'W' in request.POST.getlist('csvfrequency'):
                 freq='W'
