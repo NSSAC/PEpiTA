@@ -1,5 +1,11 @@
 ## Pull and Run Our Docker Image
-Pull: See instructions on the [pepita container package page](https://github.com/NSSAC/PEpiTA/pkgs/container/pepita).
+
+#### Implicitly pull then run [our published container](https://github.com/NSSAC/PEpiTA/pkgs/container/)
+
+```bash
+docker run --interactive --tty --publish 1234:8000  ghcr.io/nssac/pepita:1.2
+```
+#### Go to [localhost:1234](http://localhost:1234).
 
 ## Build and Run a Local Docker Image (based on the latest code)
 
