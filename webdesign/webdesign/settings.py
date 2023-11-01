@@ -26,7 +26,7 @@ BASE_PATH = os.environ.get("DJANGO_BASE_PATH", "").strip("/")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-1vw!5#xns()())&-rh6$5(urbj^%n0@f0q(5rp8m#_sf_#5qnn"
 
-CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "https://rivanna-portal.hpc.virginia.edu"]
+CSRF_TRUSTED_ORIGINS = ["https://pepita.pods.uvarc.io", "https://*.ngrok-free.app", "https://rivanna-portal.hpc.virginia.edu"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
