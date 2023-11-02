@@ -92,9 +92,11 @@ def index(request):
             messages.warning(request, 'Please enter a valid url')
 
     if request.method == 'POST' and 'uploadbutton' in request.POST:
-        uploaded_file = request.FILES['document']
+        uploaded_file = request.FILES.get('document')
 
-        if uploaded_file.name.endswith('.csv'):
+        if uploaded_file is None:
+            messages.warning(request, 'Please upload a .csv file')
+        elif uploaded_file.name.endswith('.csv') :
             savefile = FileSystemStorage()
             csvname = savefile.save(uploaded_file.name, uploaded_file)
             file_path = str(media_path / csvname)
@@ -308,13 +310,15 @@ def readapi(dataurl):
             results_df[col] = pd.to_datetime(results_df[col])
             results_df = results_df.rename(columns={col: 'date'})
             dateflag=True
-        elif not results_df[col].dtype==np.int64 or  not results_df[col].dtype==np.float64 and not dateflag:
+        elif results_df[col].dtype==np.int64 or results_df[col].dtype==np.float64 and dateflag:
+            continue 
+        else:
             results_df = results_df.drop(col, axis=1) 
             
     results_df=results_df.drop_duplicates(subset=['date'])
     results_df=results_df.set_index('date')
     input_ts = results_df
-    print(input_ts.columns.tolist())
+    # print(input_ts.columns.tolist())
 
 def readfile(filename):
     global input_ts, csvtype
@@ -407,4 +411,3 @@ def validate_url(url):
     except ValidationError:
         return False
     return True
-    
