@@ -3,6 +3,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
 from django.forms import URLField
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 
 import os
 import pandas as pd
@@ -19,38 +20,34 @@ import zipfile
 from plotly.offline import plot
 import plotly.express as px
 
-file_path = ''
-input_ts = pd.DataFrame()
-pp_ts = pd.DataFrame()
-csvname = ''
-freq = 'D'
-csvtime = ''
-context = {}
-csvtype = ''
-datamindate = ''
-datacurmindate = ''
-datamaxdate = ''
-datacurmaxdate = ''
-
 media_path = Path(__file__).resolve().parent.parent / "media"
 # make sure output paths are created
 fig_path = media_path / "figures"
 fig_path.mkdir(exist_ok=True, parents=True)
-
 analytical_summary_path = media_path / "analytical_summary"
 analytical_summary_path.mkdir(exist_ok=True, parents=True)
-
 categorize_output_path = media_path / "categorize_output"
 categorize_output_path.mkdir(exist_ok=True, parents=True)
-
 zip_path = media_path / "zip"
 zip_path.mkdir(exist_ok=True, parents=True)
 
-
 def index(request):
     cat_ts = pd.Series
+    global media_path, analytical_summary_path, categorize_output_path, zip_path
+    
+    request.session.setdefault('file_path', '')
+    # request.session.setdefault('input_ts', pd.DataFrame().to_dict())
+    # request.session.setdefault('pp_ts', pd.DataFrame().to_dict())
+    request.session.setdefault('csvname', '')
+    request.session.setdefault('freq', 'D')
+    request.session.setdefault('csvtime', '')
+    request.session.setdefault('csvtype', '')
+    request.session.setdefault('datamindate', '')
+    request.session.setdefault('datamaxdate', '')
+    request.session.setdefault('csvdata', pd.DataFrame().to_dict())
+    request.session.setdefault('csvdataheaders', [])
 
-    global file_path, input_ts, pp_ts, csvname, freq, csvtime, context, csvtype, media_path, analytical_summary_path, categorize_output_path, zip_path, datamindate, datamaxdate, datacurmindate, datacurmaxdate
+    
     context = {}
     if request.method == 'POST' and 'uploadapibutton' in request.POST:
         dataurl = request.POST.get('apiurltext')
@@ -59,35 +56,37 @@ def index(request):
                 freq = 'W'
             else:
                 freq = 'D'
-            # if 'Multitime' in request.POST.getlist('uploadtype'):
-            #     csvtype='Multitime'
-            # else:
-            #     csvtype='Singletime'
 
-            readapi(dataurl)
+            input_ts, csvtype = readapi(dataurl)
 
-            csvtime = datetime.utcnow()
-            csvname = 'API URL'
-            datamindate = input_ts.index.min()
-            datamaxdate = input_ts.index.max()
-            datacurmindate = datamindate
-            datacurmaxdate = datamaxdate
-            context = {'csvname': csvname} 
-            context.update({'csvtype': csvtype})
-            context.update({'csvtime': csvtime})
-            context.update({'csvdata': input_ts.reset_index().to_dict('records')})
-            context.update({'datamindate': datamindate})
-            context.update({'datamaxdate': datamaxdate})
-            context.update({'datacurmindate': datacurmindate})
-            context.update({'datacurmaxdate': datacurmaxdate})
+            input_ts_df = pd.DataFrame.from_dict(input_ts)
+            input_ts_df['date'] = input_ts_df['date'].dt.strftime('%Y-%m-%d')
+            input_ts_df = input_ts_df.set_index('date')
             headers = []
-            for col in input_ts.reset_index().columns:
+            for col in input_ts_df.reset_index().columns:
                 headers.append({'column': col})
-            context.update({'csvdataheaders': headers})
+
+            datamindate= json.dumps(input_ts_df.index.min(),sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+            datamaxdate= json.dumps(input_ts_df.index.max(),sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+            datacurmindate = input_ts_df.index.min()
+            datacurmaxdate = input_ts_df.index.max()
+            
+            request.session['freq'] = freq
+            request.session['csvtime'] =  json.dumps(datetime.utcnow(),sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+            request.session['csvname'] = 'API URL'
+            request.session['datamindate'] = datacurmindate
+            request.session['datamaxdate'] = datacurmaxdate
+            request.session['csvdata'] = input_ts_df.reset_index().to_dict('records')
+            request.session['csvtype'] = csvtype
+            request.session['csvdataheaders'] = headers
+
+            context={'datacurmindate': datacurmindate}
+            context.update({'datacurmaxdate': datacurmaxdate})
+            
         else:
             messages.warning(request, 'Please enter a valid url')
 
-    if request.method == 'POST' and 'uploadbutton' in request.POST:
+    elif request.method == 'POST' and 'uploadbutton' in request.POST:
         uploaded_file = request.FILES.get('document')
 
         if uploaded_file is None:
@@ -104,27 +103,44 @@ def index(request):
             else:
                 freq = 'D'
 
-            readfile(file_path)
-            context = {'csvname': csvname} 
-            context.update({'csvtype': csvtype})
-            context.update({'csvtime': csvtime})
-            context.update({'csvdata': input_ts.reset_index().to_dict('records')})
-            if 'Multitime' in csvtype:
-                datamindate = input_ts.index.min()
-                datamaxdate = input_ts.index.max()
-            elif 'Singletime' in csvtype:
-                datamindate = input_ts['date'].min()
-                datamaxdate = input_ts['date'].max()
-            datacurmindate = datamindate
-            datacurmaxdate = datamaxdate
-            context.update({'datamindate': datamindate})
-            context.update({'datamaxdate': datamaxdate})
-            context.update({'datacurmindate': datacurmindate})
-            context.update({'datacurmaxdate': datacurmaxdate})
+            input_ts, csvtype = readfile(file_path)
+
+            input_ts_df = pd.DataFrame.from_dict(input_ts)
+            input_ts_df['date'] = input_ts_df['date'].dt.strftime('%Y-%m-%d')
+
             headers = []
-            for col in input_ts.reset_index().columns:
-                headers.append({'column': col})
-            context.update({'csvdataheaders': headers})
+            if 'Multitime' in csvtype:
+                input_ts_df = input_ts_df.set_index('date') 
+                datamindate = json.dumps(input_ts_df.index.min(),sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+                datamaxdate = json.dumps(input_ts_df.index.max(),sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+                datacurmindate=input_ts_df.index.min()
+                datacurmaxdate=input_ts_df.index.max()
+
+                request.session['csvdata'] = input_ts_df.reset_index().to_dict('records')
+                
+                for col in input_ts_df.reset_index().columns:
+                    headers.append({'column': col})
+            elif 'Singletime' in csvtype:
+                datamindate =  json.dumps(input_ts_df['date'].min(),sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+                datamaxdate = json.dumps(input_ts_df['date'].max(),sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+                datacurmindate=input_ts_df['date'].min()
+                datacurmaxdate=input_ts_df['date'].max()
+
+                request.session['csvdata'] = input_ts_df.to_dict('records')
+                
+                for col in input_ts_df.columns:
+                    headers.append({'column': col})
+
+            request.session['csvname'] = csvname
+            request.session['csvtype'] = csvtype
+            request.session['csvtime'] = json.dumps(csvtime,sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+            request.session['freq'] = freq
+            request.session['csvdataheaders'] = headers
+            request.session['datamindate'] = datacurmindate
+            request.session['datamaxdate'] = datacurmaxdate
+                
+            context={'datacurmindate': datacurmindate}
+            context.update({'datacurmaxdate': datacurmaxdate})
 
         elif not uploaded_file.name.endswith('.csv'):
             messages.warning(request, 'Please use .csv file extension!')
@@ -135,10 +151,12 @@ def index(request):
         else:
             messages.warning(request, 'Upload failed. Please try again!')
 
-    if request.method == 'POST' and 'runbutton' in request.POST:
+    elif request.method == 'POST' and 'runbutton' in request.POST:
+        input_ts = pd.DataFrame.from_dict(request.session.get('csvdata'))
+        input_ts['date']= pd.to_datetime(input_ts['date'])
+
         if not input_ts.empty:
             formdata = {}
-            # formdata['csvfrequency'] = freq
             methods = request.POST.getlist('datapreprocess')
             smoothing_window = request.POST.get('smoothingwindow')
             cat_method = request.POST.getlist('categorizetype')
@@ -147,7 +165,9 @@ def index(request):
             fill_method = request.POST.getlist('fillmethod')
             datacurmindate = request.POST.getlist('min_date')
             datacurmaxdate = request.POST.getlist('max_date')
-
+        
+            context.update({'datacurmindate': datacurmindate[0]})
+            context.update({'datacurmaxdate': datacurmaxdate[0]})
             datacurmindate = datetime.strptime(datacurmindate[0], '%Y-%m-%d')
             datacurmaxdate = datetime.strptime(datacurmaxdate[0], '%Y-%m-%d')
 
@@ -177,9 +197,6 @@ def index(request):
                     maxval = int(request.POST.get('maxcustomsize'))
             custom_range = (minval, maxval)
 
-            context = {'csvname': csvname}
-            context.update({'csvtime': csvtime})
-
             formdata['smoothingwindow'] = smoothing_window
             formdata['binsize'] = num_bins
 
@@ -187,7 +204,9 @@ def index(request):
             multidf = []
             multidflist = []
             headers = []
-            if (csvtype == 'Singletime'):
+            freq=request.session['freq']
+
+            if ( request.session.get('csvtype') == 'Singletime'):
                 workflow_type = 'single'
                 input_df = input_ts.loc[(input_ts['date'] >= datacurmindate) & (input_ts['date'] <= datacurmaxdate)]
                 name, cat_ts, df, formdata = single_ts_workflow(
@@ -228,10 +247,13 @@ def index(request):
                 graph_plotly = plot(fig, output_type="div")
                 # context.update( {'graph_plotly':graph_plotly})
 
-            elif (csvtype == 'Multitime'):
-                workflow_type='multi-signal'
+            elif (request.session.get('csvtype') == 'Multitime'):
                 cat_df = pd.DataFrame()
                 input_tstmp = pd.DataFrame()
+
+                input_ts = input_ts.set_index('date') 
+                workflow_type='multi-signal'
+               
                 if input_ts[datacurmindate:datacurmaxdate].empty:
                     input_tstmp = input_ts[datacurmaxdate:datacurmindate]
                 else:
@@ -275,23 +297,33 @@ def index(request):
                     headers.append({'column': col})
                 context.update({'csvdataheaders': headers})
                 context.update({'csvdata': input_ts.reset_index().to_dict('records')})
-
                 fig = px.line(input_ts.reset_index(), x='date', y=input_ts.columns.to_list())
 
-            context.update({'datamindate': datamindate})
-            context.update({'datamaxdate': datamaxdate})
-            context.update({'datacurmindate': datacurmindate})
-            context.update({'datacurmaxdate': datacurmaxdate})
             context.update({'formdata': json.dumps(formdata)})
 
         else:
             messages.warning(request, 'No data in the memory')
-    context.update( {'currentpath': 'index'})
+    else:
+        #should figure out a way to delete sessions 
+        print("Deleting session variables")
+        del request.session['csvname'] 
+        del request.session['csvtime'] 
+        del request.session['csvtype'] 
+        del request.session['datamindate'] 
+        del request.session['datamaxdate'] 
+        del request.session['file_path'] 
+        del request.session['freq'] 
+        del request.session['csvdata'] 
+        del request.session['csvdataheaders'] 
+        request.session.modified = True  
+
+    # for key, value in request.session.items():
+    #     print('{} => {}'.format(key, value))
+
     return render(request, 'pages/index.html', context)
 
 
 def readapi(dataurl):
-    global input_ts, csvtype
     csvtype = 'Multitime'
     dateflag = False
     mainurl = dataurl[0:dataurl.index('.json')+5]
@@ -315,28 +347,34 @@ def readapi(dataurl):
             continue 
         else:
             results_df = results_df.drop(col, axis=1) 
-
     results_df = results_df.drop_duplicates(subset=['date'])
     results_df = results_df.set_index('date')
     input_ts = results_df
-    print(input_ts.columns.tolist())
+    return input_ts.reset_index().to_dict('records'), csvtype
 
-def readfile(filename):
-    global input_ts, csvtype
-    csvFile = pd.read_csv(filename)
+def readfile(file_path):
+    csvFile = pd.read_csv(file_path)
+
     if (len(csvFile.columns.tolist()) == 2 and 'date' in csvFile.columns.tolist() and 'value' in csvFile.columns.tolist()):
         csvtype = 'Singletime'
     else:
         csvtype = 'Multitime'
 
     if (csvtype == 'Singletime'):
-        input_ts = pd.read_csv(filename, parse_dates=['date'])
+        input_ts = pd.read_csv(file_path, parse_dates=['date'])
+
+        return input_ts.to_dict('records'),csvtype
     elif (csvtype == 'Multitime'):
-        input_ts = pd.read_csv(filename, parse_dates=['date'], index_col=0)
+        input_ts = pd.read_csv(file_path, parse_dates=['date'], index_col=0)
+
+    return input_ts.reset_index().to_dict('records'),csvtype
 
 
 def csvtables(request):
-    context.update({'currentpath': 'csvtables'})
+    context={}
+    context = {'csvtype': request.session.get('csvtype')} 
+    context.update({'csvdata': request.session.get('csvdata')})
+
     if request.method == 'POST':
         index(request)
         return render(request, 'pages/index.html', context)

@@ -6,14 +6,14 @@
       <h6 class="text-black up mb-0">Phase-based Epidemic Time series Analyzer</h6>
     </nav>
   </div>
-  {% if 'csvtables' in currentpath %}
+  {% if 'csvtables' in request.path %}
   <div class="container-fluid py-1 px-7">
     <a href="javascript:history.go(-1);" class="nav-link text-body font-weight-bold">
       <i class="fa fa-backward me-sm-1"></i>
       <span class="d-sm-inline d-none">Back to Analysis</span>
     </a>
   </div>
-  {% elif csvdata and csvtype%}
+  {% elif request.session.csvdata  and request.session.csvtype%}
     <div class="container-fluid py-1 px-7">
       <a href="{% url 'csvtables' %}" class="nav-link text-body font-weight-bold">
         <i class="fa fa-file-csv me-sm-1"></i>
