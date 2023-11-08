@@ -72,7 +72,7 @@ def index(request):
             datacurmaxdate = input_ts_df.index.max()
             
             request.session['freq'] = freq
-            request.session['csvtime'] =  json.dumps(datetime.utcnow(),sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+            request.session['csvtime'] =  str(datetime.utcnow())
             request.session['csvname'] = 'API URL'
             request.session['datamindate'] = datacurmindate
             request.session['datamaxdate'] = datacurmaxdate
@@ -133,7 +133,7 @@ def index(request):
 
             request.session['csvname'] = csvname
             request.session['csvtype'] = csvtype
-            request.session['csvtime'] = json.dumps(csvtime,sort_keys=True,indent=1,cls=DjangoJSONEncoder)
+            request.session['csvtime'] = str(csvtime)
             request.session['freq'] = freq
             request.session['csvdataheaders'] = headers
             request.session['datamindate'] = datacurmindate
@@ -338,8 +338,9 @@ def readapi(dataurl):
 
     results_df = pd.read_json(dataurl)
     results_df = results_df.dropna() 
+    results_df[results_df.select_dtypes(['object']).columns]=results_df[results_df.select_dtypes(['object']).columns].apply(pd.to_datetime)
     for col in results_df.columns:
-        if "date" in col.lower() and not dateflag:
+        if "date" in col.lower() or "date" in str(results_df[col].dtype) and not dateflag:
             results_df[col] = pd.to_datetime(results_df[col])
             results_df = results_df.rename(columns={col: 'date'})
             dateflag=True
