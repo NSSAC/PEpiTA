@@ -338,9 +338,8 @@ def readapi(dataurl):
 
     results_df = pd.read_json(dataurl)
     results_df = results_df.dropna() 
-    results_df[results_df.select_dtypes(['object']).columns]=results_df[results_df.select_dtypes(['object']).columns].apply(pd.to_datetime)
     for col in results_df.columns:
-        if "date" in col.lower() or "date" in str(results_df[col].dtype) and not dateflag:
+        if "date" in col.lower() or "object" in str(results_df[col].dtype) and not dateflag:
             results_df[col] = pd.to_datetime(results_df[col])
             results_df = results_df.rename(columns={col: 'date'})
             dateflag=True
