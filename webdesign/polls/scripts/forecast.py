@@ -9,7 +9,6 @@ def get_gauss_quant(temp):
     std=temp.loc[temp_ind,'fct_std']
     return loc, std
 
-
 def gen_gauss_samp(loc,std):
     N=1000
     g_dist=np.zeros(N)
@@ -41,14 +40,16 @@ def convert_quant(ff):
         ff.loc[:,'fct_std']=(ff.loc[:,'fct_ub']-ff.loc[:,'fct_lb'])/3.92
     fmt_df=pd.DataFrame()
     for i in ff.index:
-        fmt_df=fmt_df.append(conv_quant(ff.loc[[i]]))
+        #fmt_df=fmt_df.append(conv_quant(ff.loc[[i]]))
+        fmt_df = pd.concat([fmt_df,conv_quant(ff.loc[[i]])])           
         id_vars=['point','gt_avl_date','target_end_date','fct_std','fct_lb','fct_ub']
 
         out_df=fmt_df.melt(id_vars=id_vars,var_name=['output_type_id'])
     return out_df
 
 
-def ARIMA_func(y,verbose=True,log=False,bias_on=False):
+def ARIMA_func(input_ts,verbose=True,log=False,bias_on=False):
+    y = input_ts.set_index('date')['value']
     horizon=4
     if log:
         y[y<0]=0
@@ -83,22 +84,16 @@ def ARIMA_func(y,verbose=True,log=False,bias_on=False):
     qfct=convert_quant(yfct)
     return qfct,model
 
-def main():
+def fcast_example():
     loc='US'
-    hrzn='2024-03-30'
-    bias_on=False
-    #gtlocal = pd.read_csv('/sfs/qumulo/qproject/biocomplexity/forecast/CSTE/data/flu_hosp_weekly_filt_case_data.csv', dtype={'state':str})
-    #gtlocal = pd.read_csv('/project/biocomplexity/forecast/CSTE/data/data-truth/flu_hosp_weekly_data.csv',dtype={'state':str})
-    data_file='https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/target-data/target-hospital-admissions.csv'
-    df=pd.read_csv(data_file)
-    gtlocal=df.pivot(index='location',columns='date',values='value')
-    #gtlocal.set_index('location',inplace=True)
-    gtlocal.columns = [pd.Timestamp(x) for x in gtlocal.columns]
+    horizon='2024-03-30'
+    obs_date=pd.Timestamp(horizon)
 
-    obs_date=pd.to_datetime(hrzn)
-    y=gtlocal.loc[loc,:obs_date]
-    qfct,opt_model=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on)
-    print(qfct)
+    fname='https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/target-data/target-hospital-admissions.csv'
+    df=pd.read_csv(fname,parse_dates=['date'])
+    input_ts=df.pivot(index='date',columns='location',values='value')[loc].reset_index()
+    input_ts.columns = ['date','value']
+    qfct,opt_model=ARIMA_func(input_ts)
     
-if __name__ == "__main__":
-    main()
+    return qfct
+
