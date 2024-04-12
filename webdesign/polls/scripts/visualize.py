@@ -5,6 +5,10 @@ import os
 from datetime import datetime
 matplotlib.use('agg')
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
 plt.style.use('fast')
 plt.rcParams.update({'font.size': 16, 'font.family': 'sans-serif','font.sans-serif':'Verdana'})
 
@@ -217,3 +221,15 @@ def single_ts_trend_plot_nosave(pp_ts,trend_ts,cat_ts,bin_bounds,title=None):  #
     
     # Add the second legend as usual
     ax3.legend(handles3, labels3,loc=1)
+    
+def multi_cat_csq(chi_df,csq_str_df):
+    f = plt.figure(figsize=(8,8),facecolor='white')
+    ax = plt.gca()
+    sns.heatmap(chi_df,annot=csq_str_df,fmt='s',cmap=cm.inferno)
+    
+    timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+    name = timestr+'.png'
+    save_path = os.getcwd() +'/media/figures/'+name 
+    f.savefig(save_path)
+    plt.close(f)  
+    return name 
