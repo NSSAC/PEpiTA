@@ -243,8 +243,8 @@ def index(request):
                 context.update({'csvdataheaders': headers})
                 context.update({'csvdata': input_ts.to_dict('records')}) 
 
-                fig = px.line(pp_ts, x='date', y="value")
-                graph_plotly = plot(fig, output_type="div")
+                # fig = px.line(pp_ts, x='date', y="value")
+                # graph_plotly = plot(fig, output_type="div")
                 # context.update( {'graph_plotly':graph_plotly})
 
             elif (request.session.get('csvtype') == 'Multitime'):
@@ -283,6 +283,12 @@ def index(request):
                 chi_df,pval_df,csq_str_df = analyze.multi_ts_analyze(cat_df)
                 name = visualize.multi_cat_csq(chi_df,csq_str_df)
                 imagelist.insert(1, {'name': name})
+                
+                timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+                name = timestr+'_analyticalsummary_multicolumn_chisq.csv'
+                save_path = str(analytical_summary_path / name)
+                chi_df.to_csv(save_path)
+                multidflist.append(0,{'name': name})
                 
                 multiimagezip = zipfiles(imagelist, 'images','media/figures/')
                 context.update({'multiimagezip': multiimagezip})
