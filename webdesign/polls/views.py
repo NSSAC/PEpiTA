@@ -275,10 +275,15 @@ def index(request):
                     save_path = str(analytical_summary_path / name)
                     df.to_csv(save_path) 
                     multidflist.append({'name': name})
-
+                
                 cat_df.columns = input_ts.columns
                 name = visualize.multi_signal_plot(cat_df, cat_method)
                 imagelist.insert(0, {'name': name})
+                
+                chi_df,pval_df,csq_str_df = analyze.multi_ts_analyze(cat_df)
+                name = visualize.multi_cat_csq(chi_df,csq_str_df)
+                imagelist.insert(1, {'name': name})
+                
                 multiimagezip = zipfiles(imagelist, 'images','media/figures/')
                 context.update({'multiimagezip': multiimagezip})
 
