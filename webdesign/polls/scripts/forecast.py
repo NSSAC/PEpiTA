@@ -142,5 +142,5 @@ def fcast_example():
     qfct,cat_fct,opt_model=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on,horizon=horizon,cat_method=cat_method)
     print(qfct,cat_fct)
     
-    return qfct
+    return qfct, cat_fct
 
