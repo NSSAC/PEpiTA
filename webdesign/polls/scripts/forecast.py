@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import sys, os
 import pmdarima as pm
+from categorize import level_categorize
+from scipy.interpolate import griddata
 
 def get_gauss_quant(temp):
     temp_ind=temp.index
@@ -40,17 +42,30 @@ def convert_quant(ff):
         ff.loc[:,'fct_std']=(ff.loc[:,'fct_ub']-ff.loc[:,'fct_lb'])/3.92
     fmt_df=pd.DataFrame()
     for i in ff.index:
-        #fmt_df=fmt_df.append(conv_quant(ff.loc[[i]]))
-        fmt_df = pd.concat([fmt_df,conv_quant(ff.loc[[i]])])           
-        id_vars=['point','gt_avl_date','target_end_date','fct_std','fct_lb','fct_ub']
+        fmt_df=fmt_df.append(conv_quant(ff.loc[[i]]))
+        id_vars=['point','gt_avl_date','target_end_date','horizon','fct_std','fct_lb','fct_ub']
 
         out_df=fmt_df.melt(id_vars=id_vars,var_name=['output_type_id'])
     return out_df
 
 
-def ARIMA_func(input_ts,verbose=True,log=False,bias_on=False):
-    y = input_ts.set_index('date')['value']
-    horizon=4
+def get_qts_prbs(fcts,horizon):
+    qnts=fcts[fcts.horizon==horizon].value.values
+    probs=fcts[fcts.horizon==horizon].output_type_id.values
+    return qnts, probs
+
+def get_cats_bins(y,cat_method):
+    ts=pd.DataFrame()
+    ts.loc[:,'date']=y.index
+    ts.loc[:,'value']=y.values
+
+    cat_method='L-qcut'
+    num_bins=5
+    cat_ts, bin_bounds = level_categorize(ts,cat_method,num_bins)
+    return cat_ts, bin_bounds
+
+def ARIMA_func(y,verbose=True,log=False,bias_on=False, horizon=4, cat_method='L-qcut'):
+    
     if log:
         y[y<0]=0
         y=np.log(y+1)
@@ -81,19 +96,51 @@ def ARIMA_func(input_ts,verbose=True,log=False,bias_on=False):
     yfct.loc[yfct['point']<0,'point']=0
     yfct.loc[:,'gt_avl_date']=y.index[-1]
     yfct=yfct.reset_index()
+    yfct.loc[:,'horizon']=((yfct.target_end_date-yfct.gt_avl_date).dt.days//7)-1
     qfct=convert_quant(yfct)
-    return qfct,model
+    
+    cat_ts,bin_bounds=get_cats_bins(y,cat_method)
+    cat_fct=pd.DataFrame()#qfct[['gt_avl_date','target_end_date','horizon']].drop_duplicates()
+
+    cats=sorted(cat_ts.values.unique())
+
+    for h in range(0,horizon):
+        hrzn_cat=pd.DataFrame()
+        qnts,probs=get_qts_prbs(qfct,h)
+
+        qnts_app=np.append(np.append(0,qnts),np.inf)
+        probs_app=np.append(np.append(0,probs),1)
+
+        cat_cum_probs=griddata(qnts_app,probs_app,bin_bounds)
+        cat_probs=np.diff(cat_cum_probs)
+
+
+        hrzn_cat.loc[:,'output_type_id']=cats
+        hrzn_cat.loc[:,'value']=cat_probs
+        hrzn_cat.loc[:,'horizon']=h
+        # hrzn_cat=hrzn_cat.reset_index()
+        cat_fct=cat_fct.append(hrzn_cat)
+    cat_fct=qfct[['gt_avl_date','target_end_date','horizon']].drop_duplicates().merge(cat_fct,on='horizon')
+    return qfct,cat_fct, model
 
 def fcast_example():
     loc='US'
-    horizon='2024-03-30'
-    obs_date=pd.Timestamp(horizon)
+    hrzn='2024-03-16'
+    bias_on=False
+    cat_method='L-qcut'
+    horizon=4
+    #gtlocal = pd.read_csv('/sfs/qumulo/qproject/biocomplexity/forecast/CSTE/data/flu_hosp_weekly_filt_case_data.csv', dtype={'state':str})
+    #gtlocal = pd.read_csv('/project/biocomplexity/forecast/CSTE/data/data-truth/flu_hosp_weekly_data.csv',dtype={'state':str})
+    data_file='https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/target-data/target-hospital-admissions.csv'
+    df=pd.read_csv(data_file)
+    gtlocal=df.pivot(index='location',columns='date',values='value')
+    #gtlocal.set_index('location',inplace=True)
+    gtlocal.columns = [pd.Timestamp(x) for x in gtlocal.columns]
 
-    fname='https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/target-data/target-hospital-admissions.csv'
-    df=pd.read_csv(fname,parse_dates=['date'])
-    input_ts=df.pivot(index='date',columns='location',values='value')[loc].reset_index()
-    input_ts.columns = ['date','value']
-    qfct,opt_model=ARIMA_func(input_ts)
+    obs_date=pd.to_datetime(hrzn)
+    y=gtlocal.loc[loc,:obs_date]
+    qfct,cat_fct,opt_model=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on,horizon=horizon,cat_method=cat_method)
+    print(qfct,cat_fct)
     
     return qfct
 
