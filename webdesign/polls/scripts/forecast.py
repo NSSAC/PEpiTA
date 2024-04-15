@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import sys, os
 import pmdarima as pm
-from categorize import level_categorize
+from webdesign.polls.scripts import categorize
 from scipy.interpolate import griddata
 
 def get_gauss_quant(temp):
@@ -42,7 +42,8 @@ def convert_quant(ff):
         ff.loc[:,'fct_std']=(ff.loc[:,'fct_ub']-ff.loc[:,'fct_lb'])/3.92
     fmt_df=pd.DataFrame()
     for i in ff.index:
-        fmt_df=fmt_df.append(conv_quant(ff.loc[[i]]))
+        #fmt_df=fmt_df.append(conv_quant(ff.loc[[i]]))
+        fmt_df=pd.concat([fmt_df,conv_quant(ff.loc[[i]])])
         id_vars=['point','gt_avl_date','target_end_date','horizon','fct_std','fct_lb','fct_ub']
 
         out_df=fmt_df.melt(id_vars=id_vars,var_name=['output_type_id'])
@@ -61,7 +62,7 @@ def get_cats_bins(y,cat_method):
 
     cat_method='L-qcut'
     num_bins=5
-    cat_ts, bin_bounds = level_categorize(ts,cat_method,num_bins)
+    cat_ts, bin_bounds = categorize.level_categorize(ts,cat_method,num_bins)
     return cat_ts, bin_bounds
 
 def ARIMA_func(y,verbose=True,log=False,bias_on=False, horizon=4, cat_method='L-qcut'):
@@ -119,7 +120,8 @@ def ARIMA_func(y,verbose=True,log=False,bias_on=False, horizon=4, cat_method='L-
         hrzn_cat.loc[:,'value']=cat_probs
         hrzn_cat.loc[:,'horizon']=h
         # hrzn_cat=hrzn_cat.reset_index()
-        cat_fct=cat_fct.append(hrzn_cat)
+        #cat_fct=cat_fct.append(hrzn_cat)
+        cat_fct=pd.concat([cat_fct,hrzn_cat])
     cat_fct=qfct[['gt_avl_date','target_end_date','horizon']].drop_duplicates().merge(cat_fct,on='horizon')
     return qfct,cat_fct, model
 
