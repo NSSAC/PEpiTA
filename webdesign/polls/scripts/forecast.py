@@ -65,7 +65,8 @@ def get_cats_bins(y,cat_method):
     cat_ts, bin_bounds = categorize.level_categorize(ts,cat_method,num_bins)
     return cat_ts, bin_bounds
 
-def ARIMA_func(y,verbose=True,log=False,bias_on=False, horizon=4, cat_method='L-qcut'):
+def ARIMA_func(input_ts,verbose=True,log=False,bias_on=False, horizon=4, cat_method='L-qcut'):
+    y = input_ts.set_index('date')['value']
     
     if log:
         y[y<0]=0
@@ -127,22 +128,21 @@ def ARIMA_func(y,verbose=True,log=False,bias_on=False, horizon=4, cat_method='L-
 
 def fcast_example():
     loc='US'
-    hrzn='2024-03-16'
-    bias_on=False
-    cat_method='L-qcut'
-    horizon=4
-    #gtlocal = pd.read_csv('/sfs/qumulo/qproject/biocomplexity/forecast/CSTE/data/flu_hosp_weekly_filt_case_data.csv', dtype={'state':str})
-    #gtlocal = pd.read_csv('/project/biocomplexity/forecast/CSTE/data/data-truth/flu_hosp_weekly_data.csv',dtype={'state':str})
-    data_file='https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/target-data/target-hospital-admissions.csv'
-    df=pd.read_csv(data_file)
-    gtlocal=df.pivot(index='location',columns='date',values='value')
-    #gtlocal.set_index('location',inplace=True)
-    gtlocal.columns = [pd.Timestamp(x) for x in gtlocal.columns]
+    data_cutoff='2024-03-16'
+    obs_date=pd.to_datetime(data_cutoff)
 
-    obs_date=pd.to_datetime(hrzn)
-    y=gtlocal.loc[loc,:obs_date]
-    qfct,cat_fct,opt_model=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on,horizon=horizon,cat_method=cat_method)
-    print(qfct,cat_fct)
+    fname='https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/main/target-data/target-hospital-admissions.csv'
+    df=pd.read_csv(fname,parse_dates=['date'])
+    
+    input_ts=df.pivot(index='date',columns='location',values='value')[loc].reset_index()
+    input_ts.columns = ['date','value']
+    
+    qfct,cat_fct,_=ARIMA_func(input_ts)
+    
+    # bias_on=False
+    # cat_method='L-qcut'
+    # horizon=4
+    # qfct,cat_fct,_=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on,horizon=horizon,cat_method=cat_method)
     
     return qfct, cat_fct
 

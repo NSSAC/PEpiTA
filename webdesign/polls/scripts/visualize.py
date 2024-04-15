@@ -233,3 +233,26 @@ def multi_cat_csq(chi_df,csq_str_df):
     f.savefig(save_path,bbox_inches='tight')
     plt.close(f)  
     return name 
+
+def cat_fcast_plot(cat_fct):
+    cat_fct_pvt = cat_fct.pivot(index='output_type_id',columns='target_end_date',values='value')
+    cat_fct_pvt.columns = [x.date().isoformat() for x in cat_fct_pvt.columns]
+    cat_fct_pvt*=100
+    cat_fct_pvt = cat_fct_pvt.iloc[::-1]
+
+    f = plt.figure(figsize=(8,5),facecolor='white')
+    ax = plt.gca()
+    
+    sns.heatmap(cat_fct_pvt,annot=True,fmt='.01f',vmin=0,vmax=100,ax=ax)
+    ax = plt.gca()
+    for t in ax.texts: t.set_text(t.get_text() + " %")
+    plt.title('Short-term categorical forecasts')
+    plt.ylabel('Category')
+    plt.xlabel('Forecast date')
+    
+    timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+    name = timestr+'.png'
+    save_path = os.getcwd() +'/media/figures/'+name 
+    f.savefig(save_path,bbox_inches='tight')
+    plt.close(f)  
+    return name
