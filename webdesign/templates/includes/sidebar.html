@@ -242,6 +242,28 @@
           </ul>
         </div>
       </div>
+      &nbsp;
+      <div class="card bg-light" id="sidenavCard3">
+        <div class="card-body text-start p-0 w-100">
+          <label>Categorical Forecasts:</label>
+          <div class="hover-text"><i class="fa fa-info-circle text-secondary" aria-hidden="true"></i>
+            <span class="tooltip-text" style="top: -300px;right: 100%;width: 170px;" id="right">Users can check this box to obtain short-term 
+              categorical forecasts for the input time series. This is an experimental feature and is based on ARIMA model with a fixed 4-week horizon. <br>
+              It is currently enabled only for single time series with weekly resolution, to limit the training time. <br>
+              Forecasts are generated as quantiles and binned into the categorical bins from the ground truth.<br>
+              Since we do not produce trajectory forecasts, we restrict this feature to only level-based categories (L-cut or L-qcut).<br>
+            </span>
+          </div><br>
+          <ul>
+            <li style="list-style-type: none;"><input type="checkbox" id="forecast" name="forecast" value="forecast"
+                onclick="displaySelect()">
+              <label for="custombin"> Generate (Experimental)</label>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+
       <button id="submit" name="runbutton" style="cursor: auto;margin: 15px 0;" class="shadow-sm bg-white rounded ">Run</button>
     </form>
   </div>

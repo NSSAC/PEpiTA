@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import sys, os
 import pmdarima as pm
-from webdesign.polls.scripts import categorize
+from . import categorize
 from scipy.interpolate import griddata
 
 def get_gauss_quant(temp):
@@ -58,13 +58,10 @@ def get_cats_bins(y,cat_method,num_bins,win_size=None):
     ts=pd.DataFrame()
     ts.loc[:,'date']=y.index
     ts.loc[:,'value']=y.values
-    
-    if cat_method[0] == 'L':
-        cat_ts, bin_bounds = categorize.level_categorize(ts,cat_method,num_bins)
-    else:
-        trend_ts, (cat_ts, bin_bounds) = categorize.trend_categorize(pp_ts,cat_method,win_size,num_bins)
         
+    cat_ts, bin_bounds = categorize.level_categorize(ts,cat_method,num_bins)
     return cat_ts, bin_bounds
+    
 
 def ARIMA_func(input_ts,cat_method, num_bins, win_size=None, horizon=4, verbose=True,log=False,bias_on=False):
     y = input_ts.set_index('date')['value']
@@ -132,7 +129,7 @@ def ARIMA_func(input_ts,cat_method, num_bins, win_size=None, horizon=4, verbose=
         cat_fct=pd.concat([cat_fct,hrzn_cat])
     cat_fct=qfct[['gt_avl_date','target_end_date','horizon']].drop_duplicates().merge(cat_fct,on='horizon')
     
-    return qfct,cat_fct, model
+    return qfct,cat_fct
 
 def fcast_example():
     loc='US'
@@ -150,7 +147,7 @@ def fcast_example():
     cat_method='L-qcut'
     num_bins = 5
     horizon=4
-    qfct,cat_fct,_=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on,horizon=horizon,cat_method=cat_method)
+    qfct,cat_fct=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on,horizon=horizon,cat_method=cat_method)
     
     return qfct, cat_fct
 

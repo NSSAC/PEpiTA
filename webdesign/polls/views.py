@@ -14,6 +14,7 @@ from .scripts import preprocess
 from .scripts import analyze
 from .scripts import categorize
 from .scripts import visualize
+from .scripts import forecast
 import numpy as np
 import zipfile
 
@@ -223,8 +224,10 @@ def index(request):
                     num_bins,
                     custom_range
                 )
-
+                
                 context.update({'graphfile': name})
+                imagelist.append({'name':name})
+                
                 context.update({'qdata': json.loads(df.reset_index().to_json(orient = 'records'))})
                 timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
                 name = timestr+'_analyticalsummary.csv' 
@@ -242,11 +245,25 @@ def index(request):
                     headers.append({'column': col})
                 context.update({'csvdataheaders': headers})
                 context.update({'csvdata': input_ts.to_dict('records')}) 
+                
+                #### execute this block only if forecasts are needed
+                
+                if (freq=='W') and (request.POST.getlist('forecast')) and (cat_method[0] == 'categorizetypelevel'):
+                    formdata['forecast'] = 'checked'
+                    levelbasedtype = request.POST.get('levelbasedtype')
+                    formdata['categorizetypelevel'] = 'checked'
+                    formdata['levelbasedtype'] = levelbasedtype
 
-                # fig = px.line(pp_ts, x='date', y="value")
-                # graph_plotly = plot(fig, output_type="div")
-                # context.update( {'graph_plotly':graph_plotly})
-
+                    qfct, cat_fct = forecast.ARIMA_func(input_ts,levelbasedtype,num_bins)
+                    
+                    name = visualize.fcast_plot(input_ts,qfct)
+                    imagelist.append({'name':name})
+                    
+                    name = visualize.cat_fcast_plot(cat_fct)
+                    imagelist.append({'name':name})
+                
+                context.update({'imagelist': imagelist})
+                    
             elif (request.session.get('csvtype') == 'Multitime'):
                 cat_df = pd.DataFrame()
                 input_tstmp = pd.DataFrame()
