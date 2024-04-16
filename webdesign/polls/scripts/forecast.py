@@ -42,7 +42,6 @@ def convert_quant(ff):
         ff.loc[:,'fct_std']=(ff.loc[:,'fct_ub']-ff.loc[:,'fct_lb'])/3.92
     fmt_df=pd.DataFrame()
     for i in ff.index:
-        #fmt_df=fmt_df.append(conv_quant(ff.loc[[i]]))
         fmt_df=pd.concat([fmt_df,conv_quant(ff.loc[[i]])])
         id_vars=['point','gt_avl_date','target_end_date','horizon','fct_std','fct_lb','fct_ub']
 
@@ -55,24 +54,24 @@ def get_qts_prbs(fcts,horizon):
     probs=fcts[fcts.horizon==horizon].output_type_id.values
     return qnts, probs
 
-def get_cats_bins(y,cat_method):
+def get_cats_bins(y,cat_method,num_bins):
     ts=pd.DataFrame()
     ts.loc[:,'date']=y.index
     ts.loc[:,'value']=y.values
 
-    cat_method='L-qcut'
-    num_bins=5
+    # cat_method='L-qcut'
+    # num_bins=5
+    
     cat_ts, bin_bounds = categorize.level_categorize(ts,cat_method,num_bins)
     return cat_ts, bin_bounds
 
-def ARIMA_func(input_ts,verbose=True,log=False,bias_on=False, horizon=4, cat_method='L-qcut'):
+def ARIMA_func(input_ts,cat_method, num_bins, horizon=4, verbose=True,log=False,bias_on=False):
     y = input_ts.set_index('date')['value']
     
     if log:
         y[y<0]=0
         y=np.log(y+1)
     model = pm.auto_arima((y[:]), seasonal=False,error_action="ignore")
-    #fct,fct_ci=model.predict(horizon,return_conf_int=True)
     fct,fct_ci=model.predict(horizon,return_conf_int=True)
     
     if log:
@@ -101,7 +100,8 @@ def ARIMA_func(input_ts,verbose=True,log=False,bias_on=False, horizon=4, cat_met
     yfct.loc[:,'horizon']=((yfct.target_end_date-yfct.gt_avl_date).dt.days//7)-1
     qfct=convert_quant(yfct)
     
-    cat_ts,bin_bounds=get_cats_bins(y,cat_method)
+    cat_ts,bin_bounds=get_cats_bins(y,cat_method,num_bins)
+    
     cat_fct=pd.DataFrame()#qfct[['gt_avl_date','target_end_date','horizon']].drop_duplicates()
 
     cats=sorted(cat_ts.values.unique())
@@ -110,18 +110,15 @@ def ARIMA_func(input_ts,verbose=True,log=False,bias_on=False, horizon=4, cat_met
         hrzn_cat=pd.DataFrame()
         qnts,probs=get_qts_prbs(qfct,h)
 
-        qnts_app=np.append(np.append(0,qnts),np.inf)
+        qnts_app=np.append(np.append(qnts[0],qnts),qnts[-1])
         probs_app=np.append(np.append(0,probs),1)
 
         cat_cum_probs=griddata(qnts_app,probs_app,bin_bounds)
         cat_probs=np.diff(cat_cum_probs)
 
-
         hrzn_cat.loc[:,'output_type_id']=cats
         hrzn_cat.loc[:,'value']=cat_probs
         hrzn_cat.loc[:,'horizon']=h
-        # hrzn_cat=hrzn_cat.reset_index()
-        #cat_fct=cat_fct.append(hrzn_cat)
         cat_fct=pd.concat([cat_fct,hrzn_cat])
     cat_fct=qfct[['gt_avl_date','target_end_date','horizon']].drop_duplicates().merge(cat_fct,on='horizon')
     return qfct,cat_fct, model
@@ -137,12 +134,12 @@ def fcast_example():
     input_ts=df.pivot(index='date',columns='location',values='value')[loc].reset_index()
     input_ts.columns = ['date','value']
     
-    qfct,cat_fct,_=ARIMA_func(input_ts)
     
-    # bias_on=False
-    # cat_method='L-qcut'
-    # horizon=4
-    # qfct,cat_fct,_=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on,horizon=horizon,cat_method=cat_method)
+    bias_on=False
+    cat_method='L-qcut'
+    num_bins = 5
+    horizon=4
+    qfct,cat_fct,_=ARIMA_func(y,verbose=True,log=False,bias_on=bias_on,horizon=horizon,cat_method=cat_method)
     
     return qfct, cat_fct
 
