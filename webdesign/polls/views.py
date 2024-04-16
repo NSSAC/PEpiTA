@@ -278,17 +278,17 @@ def index(request):
                 
                 cat_df.columns = input_ts.columns
                 name = visualize.multi_signal_plot(cat_df, cat_method)
-                imagelist.insert(0, {'name': name})
+                imagelist.insert(0,{'name': name})
                 
                 chi_df,pval_df,csq_str_df = analyze.multi_ts_analyze(cat_df)
                 name = visualize.multi_cat_csq(chi_df,csq_str_df)
-                imagelist.insert(1, {'name': name})
+                imagelist.insert(1,{'name': name})
                 
                 timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
                 name = timestr+'_analyticalsummary_multicolumn_chisq.csv'
                 save_path = str(analytical_summary_path / name)
                 chi_df.to_csv(save_path)
-                multidflist.append(0,{'name': name})
+                multidflist.append({'name': name})
                 
                 multiimagezip = zipfiles(imagelist, 'images','media/figures/')
                 context.update({'multiimagezip': multiimagezip})

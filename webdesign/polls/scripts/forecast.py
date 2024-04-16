@@ -54,18 +54,19 @@ def get_qts_prbs(fcts,horizon):
     probs=fcts[fcts.horizon==horizon].output_type_id.values
     return qnts, probs
 
-def get_cats_bins(y,cat_method,num_bins):
+def get_cats_bins(y,cat_method,num_bins,win_size=None):
     ts=pd.DataFrame()
     ts.loc[:,'date']=y.index
     ts.loc[:,'value']=y.values
-
-    # cat_method='L-qcut'
-    # num_bins=5
     
-    cat_ts, bin_bounds = categorize.level_categorize(ts,cat_method,num_bins)
+    if cat_method[0] == 'L':
+        cat_ts, bin_bounds = categorize.level_categorize(ts,cat_method,num_bins)
+    else:
+        trend_ts, (cat_ts, bin_bounds) = categorize.trend_categorize(pp_ts,cat_method,win_size,num_bins)
+        
     return cat_ts, bin_bounds
 
-def ARIMA_func(input_ts,cat_method, num_bins, horizon=4, verbose=True,log=False,bias_on=False):
+def ARIMA_func(input_ts,cat_method, num_bins, win_size=None, horizon=4, verbose=True,log=False,bias_on=False):
     y = input_ts.set_index('date')['value']
     
     if log:
@@ -100,18 +101,27 @@ def ARIMA_func(input_ts,cat_method, num_bins, horizon=4, verbose=True,log=False,
     yfct.loc[:,'horizon']=((yfct.target_end_date-yfct.gt_avl_date).dt.days//7)-1
     qfct=convert_quant(yfct)
     
-    cat_ts,bin_bounds=get_cats_bins(y,cat_method,num_bins)
     
-    cat_fct=pd.DataFrame()#qfct[['gt_avl_date','target_end_date','horizon']].drop_duplicates()
-
+    cat_ts, bin_bounds = get_cats_bins(y,cat_method,num_bins,win_size)
+    
+    cat_fct=pd.DataFrame()
     cats=sorted(cat_ts.values.unique())
-
+    
     for h in range(0,horizon):
         hrzn_cat=pd.DataFrame()
         qnts,probs=get_qts_prbs(qfct,h)
-
-        qnts_app=np.append(np.append(qnts[0],qnts),qnts[-1])
+        
+        qnts_app=np.append(np.append(0,qnts),np.inf)
+        #qnts_app=np.append(np.append(qnts[0],qnts),qnts[-1])
         probs_app=np.append(np.append(0,probs),1)
+        
+        
+        ##### snippet for converting quantile values to trend_ts (need to be adapted)
+        # if cat_method[0]=='T':
+        #     trend_ts = ts.set_index('date').diff(periods=win_size).shift(-win_size).dropna()['value']
+        #     if cat_method=='T-percent':
+        #         trend_ts = trend_ts.divide(ts.set_index('date').loc[trend_ts.index]['value'])*100
+        
 
         cat_cum_probs=griddata(qnts_app,probs_app,bin_bounds)
         cat_probs=np.diff(cat_cum_probs)
@@ -121,6 +131,7 @@ def ARIMA_func(input_ts,cat_method, num_bins, horizon=4, verbose=True,log=False,
         hrzn_cat.loc[:,'horizon']=h
         cat_fct=pd.concat([cat_fct,hrzn_cat])
     cat_fct=qfct[['gt_avl_date','target_end_date','horizon']].drop_duplicates().merge(cat_fct,on='horizon')
+    
     return qfct,cat_fct, model
 
 def fcast_example():
