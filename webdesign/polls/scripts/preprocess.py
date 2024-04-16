@@ -5,12 +5,20 @@ def fill_dates(ts,freq):
     ## freq: 'W' if weekly, 'D' if daily
     ## return ts: sorted in time, reindexed daily
     
+    if freq=='W':
+        ### getting day of week from the first date in the csv
+        dayofweek = pd.Timestamp(ts['date'].values[0]).date().strftime('%a').upper()
+        freq = freq+'-'+dayofweek
+        
     pp_ts = ts.copy(deep=True)
     
     date_min = pp_ts['date'].min()
     date_max = pp_ts['date'].max()
     
     pp_ts.set_index('date',inplace=True)
+    
+    
+        
     pp_ts = pp_ts.sort_index().reindex(pd.date_range(date_min,date_max,freq=freq))
     pp_ts = pp_ts.reset_index().rename({'index':'date'},axis=1)
     
