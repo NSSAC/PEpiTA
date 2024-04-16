@@ -4,55 +4,55 @@
 #
 #    pip-compile requirements.in
 #
-asgiref==3.7.2
+asgiref==3.8.1
     # via django
-contourpy==1.1.0
+contourpy==1.2.1
     # via matplotlib
-cycler==0.11.0
+cycler==0.12.1
     # via matplotlib
-django==4.2
+django==5.0.4
     # via -r requirements.in
-fonttools==4.42.1
+fonttools==4.51.0
     # via matplotlib
-gunicorn==21.2.0
+gunicorn==22.0.0
     # via -r requirements.in
-json5==0.9.14
+json5==0.9.25
     # via -r requirements.in
 kiwisolver==1.4.5
     # via matplotlib
-matplotlib==3.7.2
+matplotlib==3.8.4
     # via -r requirements.in
-numpy==1.25.2
+numpy==1.26.4
     # via
     #   contourpy
     #   matplotlib
     #   pandas
-packaging==23.1
+packaging==24.0
     # via
     #   gunicorn
     #   matplotlib
     #   plotly
-pandas==2.0.3
+pandas==2.2.2
     # via -r requirements.in
-pillow==10.0.0
+pillow==10.3.0
     # via matplotlib
-plotly==5.16.1
+plotly==5.20.0
     # via -r requirements.in
-pyparsing==3.0.9
+pyparsing==3.1.2
     # via matplotlib
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
     # via
     #   matplotlib
     #   pandas
-pytz==2023.3
+pytz==2024.1
     # via pandas
 six==1.16.0
     # via python-dateutil
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via django
 tenacity==8.2.3
     # via plotly
-tzdata==2023.3
+tzdata==2024.1
     # via pandas
-whitenoise==6.5.0
+whitenoise==6.6.0
     # via -r requirements.in
