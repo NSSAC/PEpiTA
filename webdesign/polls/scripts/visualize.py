@@ -36,7 +36,7 @@ def multi_signal_plot(cat_df, cat_method):
 def single_ts_level_plot(pp_ts,cat_ts,bin_bounds, title=None):  ## use for levels
     label = cat_ts.values[0][0]
     
-    f,ax = plt.subplots(figsize=(24,11),facecolor='white')
+    f,ax = plt.subplots(figsize=(20,8),facecolor='white')
     if title:
         plt.title(title+' - Level-based categories',fontsize=20)
     else:
@@ -78,7 +78,7 @@ def single_ts_level_plot(pp_ts,cat_ts,bin_bounds, title=None):  ## use for level
 def single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds, title=None):  ## use for trends  
     label = cat_ts.values[0][0]
     
-    f,ax = plt.subplots(figsize=(24,11),facecolor='white')
+    f,ax = plt.subplots(figsize=(20,8),facecolor='white')
     if title:
         plt.title(title+' - Level-based categories',fontsize=20)
     else:
@@ -130,7 +130,7 @@ def single_ts_trend_plot(pp_ts,trend_ts,cat_ts,bin_bounds, title=None):  ## use 
 def multi_signal_plot_nosave(cat_df, cat_method):
     label = [x[0] for x in cat_df.values.flatten()][0]
     
-    f,ax = plt.subplots(figsize=(24,11),facecolor='white')
+    f,ax = plt.subplots(figsize=(20,8),facecolor='white')
     if cat_method[0]=='categorizetypelevel':
         cat_label = 'Level-based'
     else:
@@ -143,7 +143,7 @@ def multi_signal_plot_nosave(cat_df, cat_method):
 
 def single_ts_level_plot_nosave(pp_ts,cat_ts,bin_bounds,title=None):  ## use for levels
     label = cat_ts.values[0][0]
-    f,ax = plt.subplots(figsize=(24,11),facecolor='white')
+    f,ax = plt.subplots(figsize=(20,8),facecolor='white')
     if title:
         plt.title(title+' - Level-based categories',fontsize=20)
     else:
@@ -179,7 +179,7 @@ def single_ts_level_plot_nosave(pp_ts,cat_ts,bin_bounds,title=None):  ## use for
 def single_ts_trend_plot_nosave(pp_ts,trend_ts,cat_ts,bin_bounds,title=None):  ## use for trends  
     label = cat_ts.values[0][0]
     
-    f,ax = plt.subplots(figsize=(24,11),facecolor='white')
+    f,ax = plt.subplots(figsize=(20,8),facecolor='white')
     if title:
         plt.title(title+' - Level-based categories',fontsize=20)
     else:
@@ -223,7 +223,7 @@ def single_ts_trend_plot_nosave(pp_ts,trend_ts,cat_ts,bin_bounds,title=None):  #
     ax3.legend(handles3, labels3,loc=1)
     
 def multi_cat_csq(chi_df,csq_str_df):
-    f = plt.figure(figsize=(24,11),facecolor='white')
+    f = plt.figure(figsize=(20,8),facecolor='white')
     ax = plt.gca()
     sns.heatmap(chi_df,annot=csq_str_df,fmt='s',cmap=cm.inferno)
     
@@ -236,13 +236,13 @@ def multi_cat_csq(chi_df,csq_str_df):
     return name 
 
 def fcast_plot(input_ts,qfct):
-    f = plt.figure(figsize=(24,11),facecolor='white')
+    f = plt.figure(figsize=(20,8),facecolor='white')
     ax = plt.gca()
     
-    input_ts.plot(x='date',y='value',ax=ax)
+    input_ts.plot(x='date',y='value',ax=ax,label='input time series')
     qfct_noqnt = qfct.drop_duplicates(['target_end_date'])
-    qfct_noqnt.plot(x='target_end_date',y='point',ax=ax,label='median')
-    ax.fill_between(qfct_noqnt['target_end_date'].values,qfct_noqnt['fct_lb'].values,qfct_noqnt['fct_ub'].values,color='C1',alpha=0.25)
+    qfct_noqnt.plot(x='target_end_date',y='point',ax=ax,marker='o',markersize=8,ls='--',color='C3',label='median forecast')
+    ax.fill_between(qfct_noqnt['target_end_date'].values,qfct_noqnt['fct_lb'].values,qfct_noqnt['fct_ub'].values,color='C3',alpha=0.20)
     
     plt.title('Short-term forecasts',fontsize=20)
     plt.ylabel('Time series values')
@@ -261,7 +261,7 @@ def cat_fcast_plot(cat_fct):
     cat_fct_pvt*=100
     cat_fct_pvt = cat_fct_pvt.iloc[::-1]
 
-    f = plt.figure(figsize=(24,11),facecolor='white')
+    f = plt.figure(figsize=(20,8),facecolor='white')
     ax = plt.gca()
     
     sns.heatmap(cat_fct_pvt,annot=True,fmt='.01f',vmin=0,vmax=100,ax=ax)
