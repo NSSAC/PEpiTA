@@ -21,20 +21,25 @@ json5==0.9.25
 kiwisolver==1.4.5
     # via matplotlib
 matplotlib==3.8.4
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   seaborn
 numpy==1.26.4
     # via
     #   contourpy
     #   matplotlib
     #   pandas
     #   scipy
+    #   seaborn
 packaging==24.0
     # via
     #   gunicorn
     #   matplotlib
     #   plotly
 pandas==2.2.2
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   seaborn
 pillow==10.3.0
     # via matplotlib
 plotly==5.20.0
@@ -48,6 +53,8 @@ python-dateutil==2.9.0.post0
 pytz==2024.1
     # via pandas
 scipy==1.13.0
+    # via -r requirements.in
+seaborn==0.13.2
     # via -r requirements.in
 six==1.16.0
     # via python-dateutil

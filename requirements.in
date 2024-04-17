@@ -5,4 +5,5 @@ matplotlib
 pandas
 plotly
 scipy
+seaborn
 whitenoise
