@@ -254,9 +254,9 @@ def index(request):
                     formdata['categorizetypelevel'] = 'checked'
                     formdata['levelbasedtype'] = levelbasedtype
 
-                    qfct, cat_fct = forecast.ARIMA_func(input_ts,levelbasedtype,num_bins)
+                    qfct, cat_fct = forecast.ARIMA_func(input_df,levelbasedtype,num_bins)
                     
-                    name = visualize.fcast_plot(input_ts,qfct)
+                    name = visualize.fcast_plot(input_df,qfct)
                     imagelist.append({'name':name})
                     
                     name = visualize.cat_fcast_plot(cat_fct)
