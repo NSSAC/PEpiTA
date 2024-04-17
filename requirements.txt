@@ -10,12 +10,18 @@ contourpy==1.2.1
     # via matplotlib
 cycler==0.12.1
     # via matplotlib
+cython==3.0.10
+    # via pmdarima
 django==5.0.4
     # via -r requirements.in
 fonttools==4.51.0
     # via matplotlib
 gunicorn==22.0.0
     # via -r requirements.in
+joblib==1.4.0
+    # via
+    #   pmdarima
+    #   scikit-learn
 json5==0.9.25
     # via -r requirements.in
 kiwisolver==1.4.5
@@ -29,20 +35,32 @@ numpy==1.26.4
     #   contourpy
     #   matplotlib
     #   pandas
+    #   patsy
+    #   pmdarima
+    #   scikit-learn
     #   scipy
     #   seaborn
+    #   statsmodels
 packaging==24.0
     # via
     #   gunicorn
     #   matplotlib
     #   plotly
+    #   pmdarima
+    #   statsmodels
 pandas==2.2.2
     # via
     #   -r requirements.in
+    #   pmdarima
     #   seaborn
+    #   statsmodels
+patsy==0.5.6
+    # via statsmodels
 pillow==10.3.0
     # via matplotlib
 plotly==5.20.0
+    # via -r requirements.in
+pmdarima==2.0.4
     # via -r requirements.in
 pyparsing==3.1.2
     # via matplotlib
@@ -52,17 +70,34 @@ python-dateutil==2.9.0.post0
     #   pandas
 pytz==2024.1
     # via pandas
+scikit-learn==1.4.2
+    # via pmdarima
 scipy==1.13.0
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   pmdarima
+    #   scikit-learn
+    #   statsmodels
 seaborn==0.13.2
     # via -r requirements.in
 six==1.16.0
-    # via python-dateutil
+    # via
+    #   patsy
+    #   python-dateutil
 sqlparse==0.5.0
     # via django
+statsmodels==0.14.1
+    # via pmdarima
 tenacity==8.2.3
     # via plotly
+threadpoolctl==3.4.0
+    # via scikit-learn
 tzdata==2024.1
     # via pandas
+urllib3==2.2.1
+    # via pmdarima
 whitenoise==6.6.0
     # via -r requirements.in
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

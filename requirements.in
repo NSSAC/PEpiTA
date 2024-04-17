@@ -4,6 +4,7 @@ json5
 matplotlib
 pandas
 plotly
+pmdarima
 scipy
 seaborn
 whitenoise
