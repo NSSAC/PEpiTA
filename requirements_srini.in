@@ -1,0 +1,10 @@
+Django
+gunicorn
+json5
+matplotlib
+pandas
+pmdarima==2.0.4
+plotly
+scipy==1.7.1
+seaborn==0.11.2
+whitenoise
