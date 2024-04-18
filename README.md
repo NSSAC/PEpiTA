@@ -11,7 +11,7 @@ Phase-based Epidemic Time series Analyzer.
 micromamba env create --file environment.yml
 ```
 
-If you wish to try installing with pip, you can take a look at the [environment.yml](environment.yml) file
+If you wish to try installing with pip (preferably, at least, in a [virtual environment](https://docs.python.org/3.12/library/venv.html)), you can take a look at the [environment.yml](environment.yml) file
 to see what you'll need.
 
 *******************************************************************
