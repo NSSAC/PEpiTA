@@ -1,6 +1,6 @@
 ## Pull and Run Our Docker Image
 
-#### Implicitly pull then run [our published container](https://github.com/NSSAC/PEpiTA/pkgs/container/)
+#### Implicitly pull then run [our published container](https://github.com/NSSAC/PEpiTA/pkgs/container/pepita)
 
 ```bash
 docker run --interactive --tty --publish 1234:8000  ghcr.io/nssac/pepita:1.2
