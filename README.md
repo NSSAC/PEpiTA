@@ -5,13 +5,13 @@
 Phase-based Epidemic Time series Analyzer.
 
 ### 1. Install required packages
-***We recommend using [micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html#manual-installation) (or [miniconda](https://docs.anaconda.com/free/miniconda/miniconda-install)) to both install a compatible Python version, along with the dependencies.***
+***We recommend using [conda](https://docs.conda.io/en/latest) (E.g. [miniconda](https://docs.anaconda.com/free/miniconda/miniconda-install) or [micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html#manual-installation)) to both install a compatible Python version, along with the dependencies.***
 
 ```bash
 micromamba env create --file environment.yml
 ```
 
-If you wish to try installing with pip (preferably, at least, in a [virtual environment](https://docs.python.org/3.12/library/venv.html)), you can take a look at the [environment.yml](environment.yml) file
+If you wish to try [installing with pip](https://pip.pypa.io/en/stable/cli/pip_install) (preferably, at least, in a [virtual environment](https://docs.python.org/3.12/library/venv.html)), you can take a look at the [environment.yml](environment.yml) file
 to see what you'll need.
 
 *******************************************************************
