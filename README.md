@@ -5,15 +5,20 @@
 Phase-based Epidemic Time series Analyzer.
 
 ### 1. Install required packages
-#### ***Required: Python>=3.11***
+***We recommend using [micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html#manual-installation) (or [miniconda](https://docs.anaconda.com/free/miniconda/miniconda-install)) to both install a compatible Python version, along with the dependencies.***
 
 ```bash
-pip install -r requirements.txt
+micromamba env create --file environment.yml
 ```
+
+If you wish to try installing with pip, you can take a look at the [environment.yml](environment.yml) file
+to see what you'll need.
+
 *******************************************************************
 ### 2. Running Server on localhost
 Open a terminal in the PEpiTA folder and follow these commands:
 ```bash
+micromamba activate pepita
 cd webdesign
 python manage.py migrate # if running for the first time
 python manage.py runserver

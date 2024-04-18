@@ -1,0 +1,20 @@
+Bootstrap: docker
+From: mambaorg/micromamba:1-bookworm-slim
+
+%files
+LICENSE
+pepita.scif
+environment.yml
+webdesign
+
+%post
+micromamba install --yes --name base --file /environment.yml
+micromamba run --name base pip install scif ipython
+micromamba run --name base scif install /pepita.scif
+
+%environment
+export MAMBA_ROOT_PREFIX="/opt/conda"
+export PATH="${MAMBA_ROOT_PREFIX}/bin:${PATH}"
+
+%runscript
+exec scif "$@"
