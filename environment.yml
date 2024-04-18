@@ -5,7 +5,7 @@ dependencies:
   - python=3.9
   - pip
   - pip:
-    - Django==4.2.4
+    - Django==4.2.12
     - gunicorn==21.2.0
     - json5==0.9.14
     - matplotlib==3.7.2
