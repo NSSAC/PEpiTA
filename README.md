@@ -9,9 +9,11 @@ Phase-based Epidemic Time series Analyzer.
 
 ```bash
 micromamba env create --file environment.yml
+# if you want to add some dev tools, like maybe Jupyter Lab to run the notebook
+micromamba install --name pepita --file environment_dev_addon.yml
 ```
 
-If you wish to try [installing with pip](https://pip.pypa.io/en/stable/cli/pip_install) (preferably, at least, in a [virtual environment](https://docs.python.org/3.12/library/venv.html)), you can take a look at the [environment.yml](environment.yml) file
+If you wish to try [installing with pip](https://pip.pypa.io/en/stable/cli/pip_install) (preferably, at least, in a [virtual environment](https://docs.python.org/3.12/library/venv.html)), you can take a look at the conda env files ([environment.yml](environment.yml), [environment_dev_addon.yml](environment_dev_addon.yml))
 to see what you'll need.
 
 *******************************************************************
