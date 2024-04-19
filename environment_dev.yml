@@ -1,0 +1,7 @@
+name: pepita_dev
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - pip:
+    - jupyterlab==3.2.1
