@@ -4,7 +4,7 @@ from matplotlib.ticker import MaxNLocator
 import os
 from datetime import datetime
 matplotlib.use('agg')
-
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -225,7 +225,8 @@ def single_ts_trend_plot_nosave(pp_ts,trend_ts,cat_ts,bin_bounds,title=None):  #
 def multi_cat_csq(chi_df,csq_str_df):
     f = plt.figure(figsize=(20,8),facecolor='white')
     ax = plt.gca()
-    sns.heatmap(chi_df,annot=csq_str_df,fmt='s',cmap=cm.inferno)
+    mask = np.triu(np.ones_like(chi_df))
+    sns.heatmap(chi_df,annot=csq_str_df,mask=mask,fmt='s',cmap=cm.inferno)
     
     plt.title('Pairwise chi-squared values',fontsize=20)
     timestr = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
