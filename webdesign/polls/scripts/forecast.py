@@ -104,6 +104,13 @@ def ARIMA_func(input_ts,cat_method, num_bins, win_size=None, horizon=4, verbose=
     cat_fct=pd.DataFrame()
     cats=sorted(cat_ts.values.unique())
     
+    
+    if len(cats)!=num_bins:
+        # print("Not all categories present")
+        cat_type = cats[0][0]
+        str_format = ':0{}d'.format(len(str(num_bins)))
+        cats = [cat_type+('{'+str_format+'}').format(i+1) for i in range(num_bins)]
+    
     for h in range(0,horizon):
         hrzn_cat=pd.DataFrame()
         qnts,probs=get_qts_prbs(qfct,h)
@@ -111,17 +118,11 @@ def ARIMA_func(input_ts,cat_method, num_bins, win_size=None, horizon=4, verbose=
         qnts_app=np.append(np.append(0,qnts),np.inf)
         #qnts_app=np.append(np.append(qnts[0],qnts),qnts[-1])
         probs_app=np.append(np.append(0,probs),1)
-        
-        
-        ##### snippet for converting quantile values to trend_ts (need to be adapted)
-        # if cat_method[0]=='T':
-        #     trend_ts = ts.set_index('date').diff(periods=win_size).shift(-win_size).dropna()['value']
-        #     if cat_method=='T-percent':
-        #         trend_ts = trend_ts.divide(ts.set_index('date').loc[trend_ts.index]['value'])*100
-        
 
         cat_cum_probs=griddata(qnts_app,probs_app,bin_bounds)
         cat_probs=np.diff(cat_cum_probs)
+        # print(cat_probs)
+        # print(cats)
 
         hrzn_cat.loc[:,'output_type_id']=cats
         hrzn_cat.loc[:,'value']=cat_probs
